@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pinpul POS - Sistem Kasir Modern</title>
+    <title>RahmanCell - Sistem pembelian</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -180,14 +180,44 @@
             background: #dcfce7;
             color: #166534;
         }
+       .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
+       .stat-card {
+       background: white;
+       padding: 20px;
+       border-radius: 12px;
+       border-left: 4px solid var(--primary);
+       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+    .stat-card h4 { margin: 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
+    .stat-card p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>PINPUL POS</h1>
+        <div class="admin-stats">
+    <div class="stat-card">
+        <h4>Total Omzet</h4>
+        <p id="total-omzet">Rp 0</p>
+    </div>
+    <div class="stat-card" style="border-left-color: var(--success);">
+        <h4>Total Transaksi</h4>
+        <p id="total-transaksi">0</p>
+    </div>
+    <div class="stat-card" style="border-left-color: #f59e0b;">
+        <h4>Layanan Terlaris</h4>
+        <p id="layanan-populer">-</p>
+    </div>
+</div>
+        <h1>RAHMANCELL</h1>
         <p>Sistem Manajemen Transaksi Konter Digital</p>
     </header>
 
@@ -349,11 +379,36 @@
     }
 
     function prosesSimpan(total) {
-        const data = {
-            waktu: new Date().toLocaleString('id-ID'),
-            layanan: currentLayanan,
-            detail: "Transaksi Berhasil",
-            total: total
+    // Menangkap input detail berdasarkan layanan yang aktif
+    let detailTransaksi = "";
+    const noInput = document.getElementById('no');
+    const idGame = document.getElementById('idg');
+    const gameSelect = document.getElementById('game');
+    
+    if (noInput) {
+        detailTransaksi = `No: ${noInput.value}`;
+    } else if (idGame) {
+        detailTransaksi = `${gameSelect.value} (ID: ${idGame.value})`;
+    } else if (currentLayanan === 'KERETA') {
+        const jml = document.querySelectorAll('#penumpang-area input').length / 2;
+        detailTransaksi = `${jml} Tiket Kereta`;
+    }
+
+    const data = {
+        waktu: new Date().toLocaleString('id-ID'),
+        layanan: currentLayanan,
+        detail: detailTransaksi || "Selesai", // Menyimpan detail asli input
+        total: total
+    };
+
+    let history = JSON.parse(localStorage.getItem('konter_db')) || [];
+    history.push(data);
+    localStorage.setItem('konter_db', JSON.stringify(history));
+
+    alert("Berhasil! Detail transaksi: " + detailTransaksi);
+    renderTable();
+    showForm(currentLayanan.toLowerCase()); 
+}
         };
 
         let history = JSON.parse(localStorage.getItem('konter_db')) || [];
@@ -379,10 +434,39 @@
         `).join('');
     }
 
-    function resetDB() {
-        if(confirm("Hapus semua riwayat transaksi?")) {
-            localStorage.removeItem('konter_db');
-            renderTable();
+    function renderTable() {
+    const history = JSON.parse(localStorage.getItem('konter_db')) || [];
+    const tbody = document.querySelector('#dbTable tbody');
+    
+    let omzet = 0;
+    let counts = {};
+
+    // Render baris tabel
+    tbody.innerHTML = history.slice().reverse().map(t => {
+        omzet += t.total;
+        counts[t.layanan] = (counts[t.layanan] || 0) + 1;
+
+        return `
+            <tr>
+                <td>${t.waktu}</td>
+                <td><span class="badge" style="background:#e0e7ff; color:#4338ca">${t.layanan}</span></td>
+                <td><strong>${t.detail}</strong></td>
+                <td>Rp ${t.total.toLocaleString()}</td>
+                <td><span class="badge">SUKSES</span></td>
+            </tr>
+        `;
+    }).join('');
+
+    // Update Statistik Admin
+    document.getElementById('total-omzet').innerText = "Rp " + omzet.toLocaleString();
+    document.getElementById('total-transaksi').innerText = history.length;
+    
+    // Cari layanan terlaris
+    if (history.length > 0) {
+        const top = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+        document.getElementById('layanan-populer').innerText = top;
+    }
+}
         }
     }
 
@@ -391,3 +475,4 @@
 
 </body>
 </html>
+
