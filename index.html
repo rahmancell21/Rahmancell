@@ -105,10 +105,39 @@
     const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/Rahmancell.json";
 
     const dataKuota = {
-        "Telkomsel": [{p: "Flash 5GB", h: 35000}, {p: "Flash 10GB", h: 60000}],
-        "Indosat": [{p: "Freedom 3GB", h: 25000}, {p: "Freedom 10GB", h: 55000}],
-        "XL": [{p: "Xtra Combo 10GB", h: 50000}]
-    };
+    "Telkomsel": [
+        {p: "1GB 1hr", h: 4000}, {p: "2GB 1hr", h: 6000}, {p: "3GB 1hr", h: 8000},
+        {p: "1GB 3hr", h: 7000}, {p: "2GB 3hr", h: 9000}, {p: "3GB 3hr", h: 12000},
+        {p: "5GB 3hr", h: 16000}, {p: "1GB 7hr", h: 12000}, {p: "2GB 7hr", h: 16000},
+        {p: "3GB 7hr", h: 20000}, {p: "5GB 7hr", h: 27000}, {p: "10GB 7hr", h: 35000},
+        {p: "15GB 7hr", h: 45000}, {p: "2GB 30hr", h: 30000}, {p: "3GB 30hr", h: 38000},
+        {p: "5GB 30hr", h: 48000}, {p: "10GB 30hr", h: 65000}, {p: "15GB 30hr", h: 80000}
+    ],
+    "Indosat": [
+        {p: "1,5GB 1hr", h: 8000}, {p: "1,5GB 3hr", h: 10000}, {p: "5GB 2hr", h: 12000},
+        {p: "2,5GB 3hr", h: 14000}, {p: "3GB 3hr", h: 15000}, {p: "2,5GB 5hr", h: 16000},
+        {p: "3,5GB 5hr", h: 17000}, {p: "5GB 5hr", h: 20000}, {p: "7GB 7hr", h: 28000},
+        {p: "9GB 7hr", h: 30000}, {p: "14GB 14hr", h: 52000}, {p: "5GB 28hr", h: 32000},
+        {p: "7GB 28hr", h: 34000}, {p: "8GB 28hr", h: 36000}, {p: "9GB 28hr", h: 38000},
+        {p: "10GB 30hr", h: 50000}, {p: "15GB 28hr", h: 55000}, {p: "20GB 30hr", h: 80000},
+        {p: "35GB 35hr", h: 84000}
+    ],
+    "XL": [
+        {p: "XTRA 2GB 7hr", h: 12000}, {p: "XTRA 5GB 7hr", h: 25000}, {p: "XTRA 10GB 7hr", h: 40000},
+        {p: "XTRA COMBO 5GB 30hr", h: 35000}, {p: "XTRA COMBO 10GB 30hr", h: 55000},
+        {p: "XTRA COMBO 20GB 30hr", h: 85000}
+    ],
+    "AXIS": [
+        {p: "BRONET 1GB 1hr", h: 3000}, {p: "BRONET 2GB 1hr", h: 5000}, {p: "BRONET 3GB 1hr", h: 7000},
+        {p: "BRONET 1GB 7hr", h: 10000}, {p: "BRONET 2GB 7hr", h: 15000}, {p: "BRONET 5GB 7hr", h: 25000},
+        {p: "OWSEM 16GB 30hr", h: 42000}, {p: "OWSEM 24GB 30hr", h: 55000}
+    ],
+    "THREE": [
+        {p: "HAPPY 1GB 1hr", h: 3000}, {p: "HAPPY 2GB 3hr", h: 6000}, {p: "HAPPY 3GB 3hr", h: 9000},
+        {p: "ALWAYS ON 1GB", h: 6000}, {p: "ALWAYS ON 2GB", h: 10000}, {p: "ALWAYS ON 3GB", h: 15000},
+        {p: "HAPPY 12GB 30hr", h: 52000}, {p: "HAPPY 22GB 30hr", h: 75000}
+    ]
+};
 
     let currentLayanan = "";
     let selectedIsi = ""; 
@@ -245,3 +274,4 @@
 
 </body>
 </html>
+
