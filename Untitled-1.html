@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RahmanCell - Sistem pembelian</title>
+    <title>RahmanCell - Cloud POS System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,244 +15,83 @@
             --text-muted: #64748b;
             --success: #22c55e;
             --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { margin: 0; color: var(--primary); font-weight: 700; letter-spacing: -1px; text-transform: uppercase; }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
-        }
+        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .stat-card small { color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 700; }
+        .stat-card h2 { margin: 5px 0 0; font-size: 24px; }
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .menu-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s ease; border: 2px solid transparent; }
+        .menu-card:hover { transform: translateY(-3px); border-color: var(--primary); }
 
-        header h1 {
-            margin: 0;
-            color: var(--primary);
-            font-weight: 700;
-            letter-spacing: -1px;
-        }
+        .main-content { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .form-container { background: var(--card); padding: 25px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
 
-        header p {
-            color: var(--text-muted);
-            margin-top: 5px;
-        }
-
-        /* Menu Grid */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .menu-card {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-
-        .menu-card i {
-            display: block;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        /* Form Styling */
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 20px;
-        }
-
-        .form-container {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            ring: 2px var(--primary);
-        }
-
-        /* Receipt / Summary Section */
-        .summary-card {
-            background: #1e293b;
-            color: white;
-            padding: 25px;
-            border-radius: 16px;
-            height: fit-content;
-        }
-
-        .summary-card h3 { margin-top: 0; color: #94a3b8; font-size: 14px; text-transform: uppercase; }
+        .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; height: fit-content; }
         .total-price { font-size: 32px; font-weight: 700; margin: 15px 0; color: #fff; }
+        .btn-pay { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        .btn-pay {
-            width: 100%;
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Database Table */
-        .history-section {
-            margin-top: 40px;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px;
-            background: #f1f5f9;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            background: #dcfce7;
-            color: #166534;
-        }
-       .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-       .stat-card {
-       background: white;
-       padding: 20px;
-       border-radius: 12px;
-       border-left: 4px solid var(--primary);
-       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-    .stat-card h4 { margin: 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
-    .stat-card p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
+        .history-section { margin-top: 40px; background: var(--card); padding: 20px; border-radius: 16px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; color: var(--text-muted); font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: #dcfce7; color: #166534; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="admin-stats">
-    <div class="stat-card">
-        <h4>Total Omzet</h4>
-        <p id="total-omzet">Rp 0</p>
-    </div>
-    <div class="stat-card" style="border-left-color: var(--success);">
-        <h4>Total Transaksi</h4>
-        <p id="total-transaksi">0</p>
-    </div>
-    <div class="stat-card" style="border-left-color: #f59e0b;">
-        <h4>Layanan Terlaris</h4>
-        <p id="layanan-populer">-</p>
-    </div>
-</div>
-        <h1>RAHMANCELL</h1>
-        <p>Sistem Manajemen Transaksi Konter Digital</p>
+        <h1>RAHMAN CELL</h1>
+        <p>Sistem Kasir & Laporan Database Cloud</p>
     </header>
 
+    <div class="admin-dashboard">
+        <div class="stat-card"><small>Total Omzet</small><h2 id="stat-omzet">Rp 0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--success)"><small>Total Transaksi</small><h2 id="stat-count">0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--warning)"><small>Status Database</small><h2 id="db-status" style="font-size: 16px; color: var(--success);">Online</h2></div>
+    </div>
+
     <div class="menu-grid">
-        <div class="menu-card" onclick="showForm('pulsa')">📱<br>Pulsa</div>
-        <div class="menu-card" onclick="showForm('kuota')">🌐<br>Kuota</div>
-        <div class="menu-card" onclick="showForm('ewallet')">💳<br>E-Wallet</div>
-        <div class="menu-card" onclick="showForm('game')">🎮<br>Game</div>
-        <div class="menu-card" onclick="showForm('kereta')">🚆<br>Kereta</div>
+        <div class="menu-card" onclick="showForm('pulsa')">📱 Pulsa</div>
+        <div class="menu-card" onclick="showForm('kuota')">🌐 Kuota</div>
+        <div class="menu-card" onclick="showForm('ewallet')">💳 E-Wallet</div>
+        <div class="menu-card" onclick="showForm('game')">🎮 Game</div>
+        <div class="menu-card" onclick="showForm('kereta')">🚆 Kereta</div>
     </div>
 
     <div class="main-content">
         <div class="form-container">
             <h2 id="form-title">Pilih Layanan</h2>
-            <div id="dynamic-inputs">
-                <p style="color: var(--text-muted)">Klik salah satu menu di atas untuk memulai transaksi.</p>
-            </div>
+            <div id="dynamic-inputs"><p style="color: var(--text-muted)">Pilih menu untuk memulai.</p></div>
         </div>
-
         <div class="summary-card">
             <h3>Total Tagihan</h3>
             <div class="total-price" id="display-total">Rp 0</div>
             <div id="btn-area"></div>
-            <button class="btn-pay" style="background: var(--danger); margin-top: 20px; font-size: 12px;" onclick="resetDB()">Hapus Semua Riwayat</button>
         </div>
     </div>
 
     <div class="history-section">
-        <h3>Riwayat Transaksi Terkini</h3>
+        <h3>Laporan Detail RahmanCell</h3>
         <table id="dbTable">
             <thead>
                 <tr>
                     <th>WAKTU</th>
                     <th>LAYANAN</th>
-                    <th>DETAIL</th>
+                    <th>ISI / PRODUK</th>
+                    <th>TUJUAN (NO/ID)</th>
                     <th>TOTAL</th>
                     <th>STATUS</th>
                 </tr>
@@ -263,6 +102,9 @@
 </div>
 
 <script>
+    // MASUKKAN URL FIREBASE ANDA DI SINI
+    const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
     const dataKuota = {
         "Telkomsel": [{p: "Flash 5GB", h: 35000}, {p: "Flash 10GB", h: 60000}],
         "Indosat": [{p: "Freedom 3GB", h: 25000}, {p: "Freedom 10GB", h: 55000}],
@@ -270,10 +112,11 @@
     };
 
     let currentLayanan = "";
-    let currentDetail = "";
+    let selectedIsi = ""; 
 
     function showForm(tipe) {
         currentLayanan = tipe.toUpperCase();
+        selectedIsi = ""; 
         const container = document.getElementById('dynamic-inputs');
         document.getElementById('form-title').innerText = "Form " + currentLayanan;
         document.getElementById('display-total').innerText = "Rp 0";
@@ -281,198 +124,96 @@
         
         let html = "";
         if (tipe === 'pulsa') {
-            html = `
-                <div class="input-group">
-                    <label>Nomor Telepon</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>
-                <div class="input-group">
-                    <label>Nominal Pulsa</label>
-                    <input type="number" id="nom" placeholder="Contoh: 10000" oninput="updateTotal(this.value, 2000)">
-                </div>`;
+            html = `<div class="input-group"><label>Nomor Telepon</label><input type="number" id="input_no" placeholder="08xxx"></div>
+                    <div class="input-group"><label>Nominal Pulsa</label><input type="number" id="input_isi" placeholder="Contoh: 10000" oninput="updateIsi(this.value); updateTotal(this.value, 2000)"></div>`;
         } else if (tipe === 'kuota') {
-            html = `
-                <div class="input-group">
-                    <label>Pilih Operator</label>
-                    <select onchange="loadKuota(this.value)">
-                        <option value="">-- Pilih --</option>
-                        <option value="Telkomsel">Telkomsel</option>
-                        <option value="Indosat">Indosat</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-                <div id="kuota-list"></div>
-                <div class="input-group">
-                    <label>Nomor Telepon</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>`;
+            html = `<div class="input-group"><label>Operator</label><select onchange="loadKuota(this.value)"><option value="">-- Pilih --</option><option value="Telkomsel">Telkomsel</option><option value="Indosat">Indosat</option><option value="XL">XL</option></select></div>
+                    <div id="kuota-list"></div>
+                    <div class="input-group"><label>Nomor Telepon</label><input type="number" id="input_no" placeholder="08xxx"></div>`;
         } else if (tipe === 'ewallet') {
-            html = `
-                <div class="input-group">
-                    <label>Nomor HP / ID</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>
-                <div class="input-group">
-                    <label>Nominal Top Up</label>
-                    <input type="number" oninput="updateTotal(this.value, 1500)" placeholder="Jumlah saldo">
-                </div>`;
+            html = `<div class="input-group"><label>ID / No HP E-Wallet</label><input type="number" id="input_no" placeholder="08xxx"></div>
+                    <div class="input-group"><label>Nominal Isi</label><input type="number" id="input_isi" oninput="updateIsi(this.value); updateTotal(this.value, 1500)" placeholder="Jumlah Saldo"></div>`;
         } else if (tipe === 'game') {
-            html = `
-                <div class="input-group">
-                    <label>ID Game</label>
-                    <input type="text" id="idg" placeholder="User ID & Zone ID">
-                </div>
-                <div class="input-group">
-                    <label>Pilih Game</label>
-                    <select id="game">
-                        <option>Mobile Legends</option>
-                        <option>Free Fire</option>
-                        <option>PUBG</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Harga Paket</label>
-                    <input type="number" oninput="updateTotal(this.value, 1000)" placeholder="Harga modal">
-                </div>`;
+            html = `<div class="input-group"><label>ID Game</label><input type="text" id="input_no" placeholder="Contoh: 123456 (2001)"></div>
+                    <div class="input-group"><label>Nama Game</label><input type="text" id="input_isi" placeholder="Contoh: 86 Diamonds ML" oninput="updateIsi(this.value)"></div>
+                    <div class="input-group"><label>Harga</label><input type="number" oninput="updateTotal(this.value, 1000)" placeholder="Harga"></div>`;
         } else if (tipe === 'kereta') {
-            html = `
-                <div class="input-group">
-                    <label>Jumlah Tiket</label>
-                    <input type="number" onchange="genTiket(this.value)" placeholder="1">
-                </div>
-                <div id="penumpang-area"></div>
-                <div class="input-group">
-                    <label>Total Harga Tiket</label>
-                    <input type="number" oninput="updateTotal(this.value, 0)" placeholder="Total bayar">
-                </div>`;
+            html = `<div class="input-group"><label>Nama Penumpang</label><input type="text" id="input_no" placeholder="Nama"></div>
+                    <div class="input-group"><label>Tujuan / Kelas</label><input type="text" id="input_isi" placeholder="Contoh: Gambir - Bandung" oninput="updateIsi(this.value)"></div>
+                    <div class="input-group"><label>Harga Tiket</label><input type="number" oninput="updateTotal(this.value, 0)"></div>`;
         }
         container.innerHTML = html;
     }
 
     function loadKuota(op) {
         if(!op) return;
-        let html = `<div class="input-group"><label>Pilih Paket</label><select id="nom" onchange="updateTotal(this.options[this.selectedIndex].getAttribute('data-harga'), 2000)">`;
+        let html = `<div class="input-group"><label>Pilih Paket</label><select id="select_kuota" onchange="updateIsi(this.value); updateTotal(this.options[this.selectedIndex].getAttribute('data-harga'), 2000)">`;
         html += `<option value="">-- Pilih Paket --</option>`;
-        dataKuota[op].forEach(i => {
-            html += `<option value="${i.p}" data-harga="${i.h}">${i.p} (Rp ${i.h})</option>`;
-        });
+        dataKuota[op].forEach(i => { html += `<option value="${i.p}" data-harga="${i.h}">${i.p}</option>`; });
         html += `</select></div>`;
         document.getElementById('kuota-list').innerHTML = html;
     }
 
-    function genTiket(jml) {
-        let html = "";
-        for(let i=1; i<=jml; i++) {
-            html += `<div style="display:flex; gap:10px">
-                <input type="text" placeholder="Nama Psg ${i}">
-                <input type="text" placeholder="Tujuan">
-            </div>`;
-        }
-        document.getElementById('penumpang-area').innerHTML = html;
-    }
+    function updateIsi(val) { selectedIsi = val; }
 
     function updateTotal(val, admin) {
         if(!val) return;
         const total = parseInt(val) + admin;
         document.getElementById('display-total').innerText = "Rp " + total.toLocaleString();
-        document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="prosesSimpan(${total})">PROSES SEKARANG</button>`;
+        document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="prosesSimpan(${total})">SIMPAN KE DATABASE</button>`;
     }
 
-    function prosesSimpan(total) {
-    // Menangkap input detail berdasarkan layanan yang aktif
-    let detailTransaksi = "";
-    const noInput = document.getElementById('no');
-    const idGame = document.getElementById('idg');
-    const gameSelect = document.getElementById('game');
-    
-    if (noInput) {
-        detailTransaksi = `No: ${noInput.value}`;
-    } else if (idGame) {
-        detailTransaksi = `${gameSelect.value} (ID: ${idGame.value})`;
-    } else if (currentLayanan === 'KERETA') {
-        const jml = document.querySelectorAll('#penumpang-area input').length / 2;
-        detailTransaksi = `${jml} Tiket Kereta`;
-    }
-
-    const data = {
-        waktu: new Date().toLocaleString('id-ID'),
-        layanan: currentLayanan,
-        detail: detailTransaksi || "Selesai", // Menyimpan detail asli input
-        total: total
-    };
-
-    let history = JSON.parse(localStorage.getItem('konter_db')) || [];
-    history.push(data);
-    localStorage.setItem('konter_db', JSON.stringify(history));
-
-    alert("Berhasil! Detail transaksi: " + detailTransaksi);
-    renderTable();
-    showForm(currentLayanan.toLowerCase()); 
-
-   };
-    {
-        let history = JSON.parse(localStorage.getItem('konter_db')) || [];
-        history.push(data);
-        localStorage.setItem('konter_db', JSON.stringify(history));
-
-        alert("Berhasil! Transaksi telah tercatat.");
-        renderTable();
-        showForm(currentLayanan.toLowerCase()); // Reset form
-    }
-
-    function renderTable() {
-        const history = JSON.parse(localStorage.getItem('konter_db')) || [];
-        const tbody = document.querySelector('#dbTable tbody');
-        tbody.innerHTML = history.reverse().map(t => `
-            <tr>
-                <td>${t.waktu}</td>
-                <td><strong>${t.layanan}</strong></td>
-                <td>${t.detail}</td>
-                <td>Rp ${t.total.toLocaleString()}</td>
-                <td><span class="badge">SUKSES</span></td>
-            </tr>
-        `).join('');
-    }
-
-    function renderTable() {
-    const history = JSON.parse(localStorage.getItem('konter_db')) || [];
-    const tbody = document.querySelector('#dbTable tbody');
-    
-    let omzet = 0;
-    let counts = {};
-
-    // Render baris tabel
-    tbody.innerHTML = history.slice().reverse().map(t => {
-        omzet += t.total;
-        counts[t.layanan] = (counts[t.layanan] || 0) + 1;
-
-        return `
-            <tr>
-                <td>${t.waktu}</td>
-                <td><span class="badge" style="background:#e0e7ff; color:#4338ca">${t.layanan}</span></td>
-                <td><strong>${t.detail}</strong></td>
-                <td>Rp ${t.total.toLocaleString()}</td>
-                <td><span class="badge">SUKSES</span></td>
-            </tr>
-        `;
-    }).join('');
-
-    // Update Statistik Admin
-    document.getElementById('total-omzet').innerText = "Rp " + omzet.toLocaleString();
-    document.getElementById('total-transaksi').innerText = history.length;
-    
-    // Cari layanan terlaris
-    if (history.length > 0) {
-        const top = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-        document.getElementById('layanan-populer').innerText = top;
-    }
-}
+    async function prosesSimpan(total) {
+        const noTujuan = document.getElementById('input_no').value;
         
-    
+        const dataBaru = {
+            waktu: new Date().toLocaleString('id-ID'),
+            layanan: currentLayanan,
+            isi: selectedIsi, // DATA JUMLAH ISI/PRODUK
+            tujuan: noTujuan, // DATA NOMOR/ID
+            total: total
+        };
 
+        try {
+            const response = await fetch(DATABASE_URL, {
+                method: 'POST',
+                body: JSON.stringify(dataBaru),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if(response.ok) {
+                alert("Data Berhasil Disimpan!");
+                renderTable();
+                showForm(currentLayanan.toLowerCase());
+            }
+        } catch (error) { alert("Gagal koneksi database."); }
+    }
+
+    async function renderTable() {
+        try {
+            const response = await fetch(DATABASE_URL);
+            const dataJson = await response.json();
+            const history = dataJson ? Object.values(dataJson) : [];
+            const tbody = document.querySelector('#dbTable tbody');
+            let totalOmzet = 0;
+
+            tbody.innerHTML = history.slice().reverse().map(t => {
+                totalOmzet += t.total;
+                return `<tr>
+                    <td>${t.waktu}</td>
+                    <td><strong>${t.layanan}</strong></td>
+                    <td style="color:var(--primary); font-weight:600;">${t.isi || '-'}</td>
+                    <td><mark style="background:#fef08a; padding:2px 5px; border-radius:4px;">${t.tujuan}</mark></td>
+                    <td>Rp ${t.total.toLocaleString()}</td>
+                    <td><span class="badge">SUKSES</span></td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('stat-omzet').innerText = "Rp " + totalOmzet.toLocaleString();
+            document.getElementById('stat-count').innerText = history.length;
+        } catch (error) { console.log("Offline"); }
+    }
     renderTable();
 </script>
 
 </body>
 </html>
-
