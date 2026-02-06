@@ -102,7 +102,6 @@
 </div>
 
 <script>
-    // MASUKKAN URL FIREBASE ANDA DI SINI
     const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/Rahmancell.json";
 
     const dataKuota = {
@@ -113,10 +112,12 @@
 
     let currentLayanan = "";
     let selectedIsi = ""; 
+    let walletType = "";
 
     function showForm(tipe) {
         currentLayanan = tipe.toUpperCase();
         selectedIsi = ""; 
+        walletType = "";
         const container = document.getElementById('dynamic-inputs');
         document.getElementById('form-title').innerText = "Form " + currentLayanan;
         document.getElementById('display-total').innerText = "Rp 0";
@@ -125,14 +126,22 @@
         let html = "";
         if (tipe === 'pulsa') {
             html = `<div class="input-group"><label>Nomor Telepon</label><input type="number" id="input_no" placeholder="08xxx"></div>
-                    <div class="input-group"><label>Nominal Pulsa</label><input type="number" id="input_isi" placeholder="Contoh: 10000" oninput="updateIsi(this.value); updateTotal(this.value, 2000)"></div>`;
+                    <div class="input-group"><label>Nominal Pulsa</label><input type="number" id="input_isi" placeholder="Contoh: 10000" oninput="updateIsi(this.value); updateTotal(this.value, 3000)"></div>`;
         } else if (tipe === 'kuota') {
             html = `<div class="input-group"><label>Operator</label><select onchange="loadKuota(this.value)"><option value="">-- Pilih --</option><option value="Telkomsel">Telkomsel</option><option value="Indosat">Indosat</option><option value="XL">XL</option></select></div>
                     <div id="kuota-list"></div>
                     <div class="input-group"><label>Nomor Telepon</label><input type="number" id="input_no" placeholder="08xxx"></div>`;
         } else if (tipe === 'ewallet') {
-            html = `<div class="input-group"><label>ID / No HP E-Wallet</label><input type="number" id="input_no" placeholder="08xxx"></div>
-                    <div class="input-group"><label>Nominal Isi</label><input type="number" id="input_isi" oninput="updateIsi(this.value); updateTotal(this.value, 1500)" placeholder="Jumlah Saldo"></div>`;
+            html = `<div class="input-group"><label>Pilih E-Wallet</label>
+                        <select id="wallet_select" onchange="updateWalletType(this.value)">
+                            <option value="">-- Pilih E-Wallet --</option>
+                            <option value="DANA">DANA</option>
+                            <option value="ShopeePay">ShopeePay</option>
+                            <option value="GoPay">GoPay</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>ID / No HP E-Wallet</label><input type="number" id="input_no" placeholder="08xxx"></div>
+                    <div class="input-group"><label>Nominal Isi</label><input type="number" id="input_isi" oninput="updateIsiEwallet(this.value); updateTotal(this.value, 2000)" placeholder="Jumlah Saldo"></div>`;
         } else if (tipe === 'game') {
             html = `<div class="input-group"><label>ID Game</label><input type="text" id="input_no" placeholder="Contoh: 123456 (2001)"></div>
                     <div class="input-group"><label>Nama Game</label><input type="text" id="input_isi" placeholder="Contoh: 86 Diamonds ML" oninput="updateIsi(this.value)"></div>
@@ -154,10 +163,25 @@
         document.getElementById('kuota-list').innerHTML = html;
     }
 
+    function updateWalletType(val) {
+        walletType = val;
+        let nominal = document.getElementById('input_isi').value;
+        updateIsiEwallet(nominal);
+    }
+
+    function updateIsiEwallet(val) {
+        // Menggabungkan Nama Wallet dan Nominal (Contoh: DANA 50.000)
+        selectedIsi = walletType + " " + (val ? parseInt(val).toLocaleString() : "");
+    }
+
     function updateIsi(val) { selectedIsi = val; }
 
     function updateTotal(val, admin) {
-        if(!val) return;
+        if(!val || val == 0) {
+            document.getElementById('display-total').innerText = "Rp 0";
+            document.getElementById('btn-area').innerHTML = "";
+            return;
+        }
         const total = parseInt(val) + admin;
         document.getElementById('display-total').innerText = "Rp " + total.toLocaleString();
         document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="prosesSimpan(${total})">SIMPAN KE DATABASE</button>`;
@@ -165,12 +189,16 @@
 
     async function prosesSimpan(total) {
         const noTujuan = document.getElementById('input_no').value;
+        if(!noTujuan || !selectedIsi) {
+            alert("Harap lengkapi data!");
+            return;
+        }
         
         const dataBaru = {
             waktu: new Date().toLocaleString('id-ID'),
             layanan: currentLayanan,
-            isi: selectedIsi, // DATA JUMLAH ISI/PRODUK
-            tujuan: noTujuan, // DATA NOMOR/ID
+            isi: selectedIsi, 
+            tujuan: noTujuan, 
             total: total
         };
 
@@ -217,4 +245,3 @@
 
 </body>
 </html>
-
