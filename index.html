@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RahmanCell - Sistem pembelian</title>
+    <title>Pinpul POS - Admin & Kasir Modern</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,15 +42,29 @@
             letter-spacing: -1px;
         }
 
-        header p {
-            color: var(--text-muted);
-            margin-top: 5px;
+        /* Dashboard Admin Stats */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h4 { margin: 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
+        .stat-card p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
 
         /* Menu Grid */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
@@ -71,13 +85,7 @@
             border-color: var(--primary);
         }
 
-        .menu-card i {
-            display: block;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        /* Form Styling */
+        /* Form & Summary Layout */
         .main-content {
             display: grid;
             grid-template-columns: 1fr 350px;
@@ -91,389 +99,6 @@
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: border 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            ring: 2px var(--primary);
-        }
-
-        /* Receipt / Summary Section */
-        .summary-card {
-            background: #1e293b;
-            color: white;
-            padding: 25px;
-            border-radius: 16px;
-            height: fit-content;
-        }
-
-        .summary-card h3 { margin-top: 0; color: #94a3b8; font-size: 14px; text-transform: uppercase; }
-        .total-price { font-size: 32px; font-weight: 700; margin: 15px 0; color: #fff; }
-
-        .btn-pay {
-            width: 100%;
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Database Table */
-        .history-section {
-            margin-top: 40px;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px;
-            background: #f1f5f9;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            background: #dcfce7;
-            color: #166534;
-        }
-       .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-       .stat-card {
-       background: white;
-       padding: 20px;
-       border-radius: 12px;
-       border-left: 4px solid var(--primary);
-       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-    .stat-card h4 { margin: 0; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
-    .stat-card p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <div class="admin-stats">
-    <div class="stat-card">
-        <h4>Total Omzet</h4>
-        <p id="total-omzet">Rp 0</p>
-    </div>
-    <div class="stat-card" style="border-left-color: var(--success);">
-        <h4>Total Transaksi</h4>
-        <p id="total-transaksi">0</p>
-    </div>
-    <div class="stat-card" style="border-left-color: #f59e0b;">
-        <h4>Layanan Terlaris</h4>
-        <p id="layanan-populer">-</p>
-    </div>
-</div>
-        <h1>RAHMANCELL</h1>
-        <p>Murah, cepat, dan aman</p>
-    </header>
-
-    <div class="menu-grid">
-        <div class="menu-card" onclick="showForm('pulsa')">📱<br>Pulsa</div>
-        <div class="menu-card" onclick="showForm('kuota')">🌐<br>Kuota</div>
-        <div class="menu-card" onclick="showForm('ewallet')">💳<br>E-Wallet</div>
-        <div class="menu-card" onclick="showForm('game')">🎮<br>Game</div>
-        <div class="menu-card" onclick="showForm('kereta')">🚆<br>Kereta</div>
-    </div>
-
-    <div class="main-content">
-        <div class="form-container">
-            <h2 id="form-title">Pilih Layanan</h2>
-            <div id="dynamic-inputs">
-                <p style="color: var(--text-muted)">Klik salah satu menu di atas untuk memulai transaksi.</p>
-            </div>
-        </div>
-
-        <div class="summary-card">
-            <h3>Total Tagihan</h3>
-            <div class="total-price" id="display-total">Rp 0</div>
-            <div id="btn-area"></div>
-            <button class="btn-pay" style="background: var(--danger); margin-top: 20px; font-size: 12px;" onclick="resetDB()">Hapus Semua Riwayat</button>
-        </div>
-    </div>
-
-    <div class="history-section">
-        <h3>Riwayat Transaksi Terkini</h3>
-        <table id="dbTable">
-            <thead>
-                <tr>
-                    <th>WAKTU</th>
-                    <th>LAYANAN</th>
-                    <th>DETAIL</th>
-                    <th>TOTAL</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    const dataKuota = {
-        "Telkomsel": [{p: "Flash 5GB", h: 35000}, {p: "Flash 10GB", h: 60000}],
-        "Indosat": [{p: "Freedom 3GB", h: 25000}, {p: "Freedom 10GB", h: 55000}],
-        "XL": [{p: "Xtra Combo 10GB", h: 50000}]
-    };
-
-    let currentLayanan = "";
-    let currentDetail = "";
-
-    function showForm(tipe) {
-        currentLayanan = tipe.toUpperCase();
-        const container = document.getElementById('dynamic-inputs');
-        document.getElementById('form-title').innerText = "Form " + currentLayanan;
-        document.getElementById('display-total').innerText = "Rp 0";
-        document.getElementById('btn-area').innerHTML = "";
-        
-        let html = "";
-        if (tipe === 'pulsa') {
-            html = `
-                <div class="input-group">
-                    <label>Nomor Telepon</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>
-                <div class="input-group">
-                    <label>Nominal Pulsa</label>
-                    <input type="number" id="nom" placeholder="Contoh: 10000" oninput="updateTotal(this.value, 2000)">
-                </div>`;
-        } else if (tipe === 'kuota') {
-            html = `
-                <div class="input-group">
-                    <label>Pilih Operator</label>
-                    <select onchange="loadKuota(this.value)">
-                        <option value="">-- Pilih --</option>
-                        <option value="Telkomsel">Telkomsel</option>
-                        <option value="Indosat">Indosat</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-                <div id="kuota-list"></div>
-                <div class="input-group">
-                    <label>Nomor Telepon</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>`;
-        } else if (tipe === 'ewallet') {
-            html = `
-                <div class="input-group">
-                    <label>Nomor HP / ID</label>
-                    <input type="number" id="no" placeholder="08xxx">
-                </div>
-                <div class="input-group">
-                    <label>Nominal Top Up</label>
-                    <input type="number" oninput="updateTotal(this.value, 1500)" placeholder="Jumlah saldo">
-                </div>`;
-        } else if (tipe === 'game') {
-            html = `
-                <div class="input-group">
-                    <label>ID Game</label>
-                    <input type="text" id="idg" placeholder="User ID & Zone ID">
-                </div>
-                <div class="input-group">
-                    <label>Pilih Game</label>
-                    <select id="game">
-                        <option>Mobile Legends</option>
-                        <option>Free Fire</option>
-                        <option>PUBG</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Harga Paket</label>
-                    <input type="number" oninput="updateTotal(this.value, 1000)" placeholder="Harga modal">
-                </div>`;
-        } else if (tipe === 'kereta') {
-            html = `
-                <div class="input-group">
-                    <label>Jumlah Tiket</label>
-                    <input type="number" onchange="genTiket(this.value)" placeholder="1">
-                </div>
-                <div id="penumpang-area"></div>
-                <div class="input-group">
-                    <label>Total Harga Tiket</label>
-                    <input type="number" oninput="updateTotal(this.value, 0)" placeholder="Total bayar">
-                </div>`;
-        }
-        container.innerHTML = html;
-    }
-
-    function loadKuota(op) {
-        if(!op) return;
-        let html = `<div class="input-group"><label>Pilih Paket</label><select id="nom" onchange="updateTotal(this.options[this.selectedIndex].getAttribute('data-harga'), 2000)">`;
-        html += `<option value="">-- Pilih Paket --</option>`;
-        dataKuota[op].forEach(i => {
-            html += `<option value="${i.p}" data-harga="${i.h}">${i.p} (Rp ${i.h})</option>`;
-        });
-        html += `</select></div>`;
-        document.getElementById('kuota-list').innerHTML = html;
-    }
-
-    function genTiket(jml) {
-        let html = "";
-        for(let i=1; i<=jml; i++) {
-            html += `<div style="display:flex; gap:10px">
-                <input type="text" placeholder="Nama Psg ${i}">
-                <input type="text" placeholder="Tujuan">
-            </div>`;
-        }
-        document.getElementById('penumpang-area').innerHTML = html;
-    }
-
-    function updateTotal(val, admin) {
-        if(!val) return;
-        const total = parseInt(val) + admin;
-        document.getElementById('display-total').innerText = "Rp " + total.toLocaleString();
-        document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="prosesSimpan(${total})">PROSES SEKARANG</button>`;
-    }
-
-    function prosesSimpan(total) {
-    // Menangkap input detail berdasarkan layanan yang aktif
-    let detailTransaksi = "";
-    const noInput = document.getElementById('no');
-    const idGame = document.getElementById('idg');
-    const gameSelect = document.getElementById('game');
-    
-    if (noInput) {
-        detailTransaksi = `No: ${noInput.value}`;
-    } else if (idGame) {
-        detailTransaksi = `${gameSelect.value} (ID: ${idGame.value})`;
-    } else if (currentLayanan === 'KERETA') {
-        const jml = document.querySelectorAll('#penumpang-area input').length / 2;
-        detailTransaksi = `${jml} Tiket Kereta`;
-    }
-
-    const data = {
-        waktu: new Date().toLocaleString('id-ID'),
-        layanan: currentLayanan,
-        detail: detailTransaksi || "Selesai", // Menyimpan detail asli input
-        total: total
-    };
-
-    let history = JSON.parse(localStorage.getItem('konter_db')) || [];
-    history.push(data);
-    localStorage.setItem('konter_db', JSON.stringify(history));
-
-    alert("Berhasil! Detail transaksi: " + detailTransaksi);
-    renderTable();
-    showForm(currentLayanan.toLowerCase()); 
-
-   };
-    {
-        let history = JSON.parse(localStorage.getItem('konter_db')) || [];
-        history.push(data);
-        localStorage.setItem('konter_db', JSON.stringify(history));
-
-        alert("Berhasil! Transaksi telah tercatat.");
-        renderTable();
-        showForm(currentLayanan.toLowerCase()); // Reset form
-    }
-
-    function renderTable() {
-        const history = JSON.parse(localStorage.getItem('konter_db')) || [];
-        const tbody = document.querySelector('#dbTable tbody');
-        tbody.innerHTML = history.reverse().map(t => `
-            <tr>
-                <td>${t.waktu}</td>
-                <td><strong>${t.layanan}</strong></td>
-                <td>${t.detail}</td>
-                <td>Rp ${t.total.toLocaleString()}</td>
-                <td><span class="badge">SUKSES</span></td>
-            </tr>
-        `).join('');
-    }
-
-    function renderTable() {
-    const history = JSON.parse(localStorage.getItem('konter_db')) || [];
-    const tbody = document.querySelector('#dbTable tbody');
-    
-    let omzet = 0;
-    let counts = {};
-
-    // Render baris tabel
-    tbody.innerHTML = history.slice().reverse().map(t => {
-        omzet += t.total;
-        counts[t.layanan] = (counts[t.layanan] || 0) + 1;
-
-        return `
-            <tr>
-                <td>${t.waktu}</td>
-                <td><span class="badge" style="background:#e0e7ff; color:#4338ca">${t.layanan}</span></td>
-                <td><strong>${t.detail}</strong></td>
-                <td>Rp ${t.total.toLocaleString()}</td>
-                <td><span class="badge">SUKSES</span></td>
-            </tr>
-        `;
-    }).join('');
-
-    // Update Statistik Admin
-    document.getElementById('total-omzet').innerText = "Rp " + omzet.toLocaleString();
-    document.getElementById('total-transaksi').innerText = history.length;
-    
-    // Cari layanan terlaris
-    if (history.length > 0) {
-        const top = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-        document.getElementById('layanan-populer').innerText = top;
-    }
-}
-        
-    
-
-    renderTable();
-</script>
-
-</body>
-</html>
-
-
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border
