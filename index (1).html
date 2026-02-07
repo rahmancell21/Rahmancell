@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RahmanCell - Cloud POS System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-hover: #4338ca; --bg: #f8fafc;
+            --card: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { margin: 0; color: var(--primary); font-weight: 700; letter-spacing: -1px; text-transform: uppercase; }
+        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .menu-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: 0.2s; border: 2px solid transparent; }
+        .menu-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .main-content { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .form-container { background: var(--card); padding: 25px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; }
+        .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; }
+        .total-price { font-size: 32px; font-weight: 700; margin: 15px 0; color: #fff; }
+        .btn-pay { width: 100%; background: var(--success); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .history-section { margin-top: 40px; background: var(--card); padding: 20px; border-radius: 16px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; background: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>RAHMAN CELL</h1><p>Sistem Kasir & Laporan Cloud</p></header>
+
+     <div class="admin-dashboard">
+        <div class="stat-card"><small>Omzet</small><h2 id="stat-omzet">Rp 0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--success)"><small>Transaksi</small><h2 id="stat-count">0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--warning)"><small>DB</small><h2 id="db-status" style="font-size: 16px; color: var(--success);">Online</h2></div>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-card" onclick="showForm('pulsa')">📱 Pulsa</div>
+        <div class="menu-card" onclick="showForm('kuota')">🌐 Kuota</div>
+        <div class="menu-card" onclick="showForm('ewallet')">💳 E-Wallet</div>
+    </div>
+
+    <div class="main-content">
+        <div class="form-container">
+            <h2 id="form-title">Pilih Layanan</h2>
+            <div id="dynamic-inputs"></div>
+        </div>
+        <div class="summary-card">
+            <h3>Total Tagihan</h3>
+            <div class="total-price" id="display-total">Rp 0</div>
+            <div id="btn-area"></div>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <h3>Laporan RahmanCell</h3>
+        <table id="dbTable">
+            <thead><tr><th>WAKTU</th><th>LAYANAN</th><th>PRODUK</th><th>TUJUAN</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/Rahmancell.json";
+
+    // DATA LENGKAP DARI EXCEL KAMU
+    const dataKuota = {
+        "TELKOMSEL": [
+            {p: "1GB/1hr = 9k", h: 7000}, {p: "1GB/3hr=12k", h: 10000}, {p: "2.5GB/3hr=14k", h: 12000},
+            {p: "3GB/1hr = 15k", h: 13000}, {p: "2,5GB/5hr = 15k", h: 13000}, {p: "2GB/7hr = 17k", h: 15000},
+            {p: "1,5GB/14hr = 25k", h: 23000}, {p: "3GB/3hr = 16k", h: 14000}, {p: "8GB/1bln = 40k", h: 38000}
+        ],
+        "INDOSAT": [
+            {p: "1,5GB 1hr", h: 6000}, {p: "1,5GB 3hr", h: 8000}, {p: "5GB 2hr", h: 10000},
+            {p: "2,5GB 3hr", h: 12000}, {p: "3GB 3hr", h: 13000}, {p: "2,5GB 5hr", h: 14000},
+            {p: "3,5GB 5hr", h: 15000}, {p: "5GB 5hr", h: 18000}, {p: "7GB 7hr", h: 26000},
+            {p: "9GB 7hr", h: 28000}, {p: "14GB 14hr", h: 50000}, {p: "5GB 28hr", h: 30000},
+            {p: "7GB 28hr", h: 32000}, {p: "8GB 28hr", h: 34000}, {p: "9GB 28hr", h: 36000},
+            {p: "10GB 30hr", h: 48000}, {p: "15GB 28hr", h: 53000}, {p: "20GB 30hr", h: 78000},
+            {p: "35GB 35hr", h: 82000}
+        ],
+        "XL": [
+            {p: "1GB 2hr = 6k", h: 4000}, {p: "2GB 2hr	 8k", h: 6000}, {p: "3GB 2hr	11k", h: 9000},
+            {p: "5GB 2hr	13k", h: 11000}, {p: "2GB 5hr	16k", h: 14000}, {p: "2,5GB	7hr	18k", h: 16000},
+        ],
+        "AXIS": [
+            {p: "BRONET 1GB 1hr", h: 3000}, {p: "BRONET 5GB 7hr", h: 25000}, {p: "OWSEM 24GB 30hr", h: 55000},
+            {p: "BRONET 1GB 1hr", h: 3000}, {p: "BRONET 5GB 7hr", h: 25000}, {p: "OWSEM 24GB 30hr", h: 55000}
+        ],
+        "THREE": [
+            {p: "2,5gb/1h	7k", h: 5000}, {p: "3gb/1h	9k", h: 7000}, {p: "6gb/2h	12k", h: 10000},
+            {p: "3,5gb/3h	14k", h: 12000}, {p: "3,5gb/5h	17k", h: 15000}, {p: "2,5gb/14h	20k", h: 18000}
+        ],
+        "SMARTFREN": [
+            {p: "1gb/3h	9k", h: 7000}, {p: "2gb/3h	12k", h: 10000}, {p: "4gb/3h	13k", h: 11000},
+            {p: "3gb/2hr	11k", h: 9000}, {p: "3gb/5h	15k", h: 13000}, {p: "6gb/7h	17k", h: 15000}
+        ],
+        "BYU": [
+            {p: "4gb/3hr	10k", h: 8000}, {p: "10gb/1hr	12k", h: 10000}, {p: "3gb/7hr	13k", h: 11000},
+            {p: "5gb/7hr	15k", h: 13000}, {p: "7gb/14hr	17k", h: 15000}, {p: "10gb/14hr	26k", h: 24000}
+        ]
+    };
+
+    let currentLayanan = "", selectedIsi = "", walletType = "";
+
+    function showForm(tipe) {
+        currentLayanan = tipe.toUpperCase(); selectedIsi = ""; walletType = "";
+        const container = document.getElementById('dynamic-inputs');
+        document.getElementById('form-title').innerText = "Form " + currentLayanan;
+        document.getElementById('display-total').innerText = "Rp 0";
+        document.getElementById('btn-area').innerHTML = "";
+        
+        if (tipe === 'pulsa') {
+            container.innerHTML = `<div class="input-group"><label>No HP</label><input type="number" id="input_no"></div>
+                    <div class="input-group"><label>Nominal</label><input type="number" oninput="selectedIsi=this.value; updateTotal(this.value, 3000)"></div>`;
+        } else if (tipe === 'kuota') {
+            container.innerHTML = `<div class="input-group"><label>Operator</label>
+                    <select onchange="loadKuota(this.value)">
+                        <option value="">-- Pilih --</option>
+                        <option value="TELKOMSEL">Telkomsel</option>
+                        <option value="INDOSAT">Indosat</option>
+                        <option value="XL">XL</option>
+                        <option value="AXIS">AXIS</option>
+                        <option value="THREE">Three (3)</option>
+                        <option value="SMARTFREN">Smartfren</option>
+                        <option value="BYU">by.U</option>
+                    </select></div><div id="kuota-list"></div>
+                    <div class="input-group"><label>No HP</label><input type="number" id="input_no"></div>`;
+        } else if (tipe === 'ewallet') {
+            container.innerHTML = `<div class="input-group"><label>E-Wallet</label>
+                    <select onchange="walletType=this.value"><option value="">-- Pilih --</option>
+                    <option value="DANA">DANA</option><option value="SHOPEEPAY">ShopeePay</option><option value="GOPAY">GoPay</option></select></div>
+                    <div class="input-group"><label>No HP/ID</label><input type="number" id="input_no"></div>
+                    <div class="input-group"><label>Nominal</label><input type="number" oninput="selectedIsi=walletType+' '+this.value; updateTotal(this.value, 2000)"></div>`;
+        }
+    }
+
+    function loadKuota(op) {
+        let html = `<div class="input-group"><label>Paket</label><select onchange="selectedIsi=this.value; updateTotal(this.options[this.selectedIndex].getAttribute('data-harga'), 2000)">
+                    <option value="">-- Pilih Paket --</option>`;
+        dataKuota[op].forEach(i => { html += `<option value="${i.p}" data-harga="${i.h}">${i.p}</option>`; });
+        document.getElementById('kuota-list').innerHTML = html + `</select></div>`;
+    }
+
+    function updateTotal(val, admin) {
+        if(!val || val == 0) return;
+        const total = parseInt(val) + admin;
+        document.getElementById('display-total').innerText = "Rp " + total.toLocaleString();
+        document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="prosesSimpan(${total})">SIMPAN DATA</button>`;
+    }
+
+    async function prosesSimpan(total) {
+        const dataBaru = { waktu: new Date().toLocaleString('id-ID'), layanan: currentLayanan, isi: selectedIsi, tujuan: document.getElementById('input_no').value, total: total };
+        try {
+            const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(dataBaru) });
+            if(res.ok) { 
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data Tersimpan', timer: 1500, showConfirmButton: false });
+                renderTable(); showForm(currentLayanan.toLowerCase());
+            }
+        } catch (e) { Swal.fire('Error', 'Gagal Simpan', 'error'); }
+    }
+
+    async function renderTable() {
+        const res = await fetch(DATABASE_URL); const data = await res.json();
+        const history = data ? Object.values(data) : [];
+        let omzet = 0;
+        document.querySelector('#dbTable tbody').innerHTML = history.reverse().map(t => {
+            omzet += t.total;
+            return `<tr><td>${t.waktu}</td><td>${t.layanan}</td><td>${t.isi}</td><td>${t.tujuan}</td><td>Rp ${t.total.toLocaleString()}</td><td><span class="badge">SUKSES</span></td></tr>`;
+        }).join('');
+        document.getElementById('stat-omzet').innerText = "Rp " + omzet.toLocaleString();
+        document.getElementById('stat-count').innerText = history.length;
+    }
+    renderTable();
+</script>
+</body>
+</html>
