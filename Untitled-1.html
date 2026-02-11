@@ -270,7 +270,7 @@
             d.layanan = "GAME: " + g; d.isi = nom;
         }
 
-        if (!ok || HARGA_FINAL === 0) return Swal.fire('GAGAL!', 'EHH, ENTE NIAT BELI NGGAK? KLO NIAT DI ISI!', 'error');
+        if (!ok || HARGA_FINAL === 0) return Swal.fire('GAGAL!', 'DATA YANG DIMINTA BELUM LENGKAP!', 'error');
 
         try {
             const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(d) });
@@ -295,4 +295,5 @@
     renderTable();
 </script>
 </body>
+
 </html>
