@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RahmanCell - Cloud POS System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --bg: #f8fafc;
+            --card: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #22c55e; --border: #e2e8f0;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { margin: 0; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+        
+        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .stat-card h2 { margin: 5px 0 0; font-size: 20px; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        .menu-card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; border: 2px solid transparent; font-weight: 600; }
+        .menu-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+
+        .form-container { background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #dynamic-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; box-sizing: border-box; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .total-price { font-size: 32px; font-weight: 700; }
+        .btn-pay { background: var(--success); color: white; border: none; padding: 15px 40px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 16px; }
+
+        .history-section { background: var(--card); padding: 20px; border-radius: 16px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 12px; color: var(--text-muted); }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>RAHMAN CELL</h1><p>MURAH, AMAN, DAN TERPERCAYA</p></header>
+
+    <div class="admin-dashboard">
+        <div class="stat-card"><small>Omzet Hari Ini</small><h2 id="stat-omzet">Rp 0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--success)"><small>Total Transaksi</small><h2 id="stat-count">0</h2></div>
+        <div class="stat-card" style="border-left-color: #f59e0b"><small>Status DB</small><h2 style="font-size: 16px; color: var(--success);">Online</h2></div>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-card" onclick="showForm('pulsa')">📱 PULSA</div>
+        <div class="menu-card" onclick="showForm('kuota')">🌐 KUOTA</div>
+        <div class="menu-card" onclick="showForm('ewallet')">💳 E-WALLET</div>
+        <div class="menu-card" onclick="showForm('game')" style="background: #fffbeb; color: #b45309;">🎮 TOP UP GAME</div>
+    </div>
+
+    <div class="form-container">
+        <h2 id="form-title" style="margin:0 0 20px 0; font-size: 18px; color: var(--primary);">Pilih Layanan</h2>
+        <div id="dynamic-inputs"></div>
+    </div>
+
+    <div class="summary-card" id="summary-section" style="display: none;">
+        <div><small>TOTAL TAGIHAN</small><div class="total-price" id="display-total">Rp 0</div></div>
+        <div><button class="btn-pay" onclick="validasiKeras()">PROSES & SIMPAN</button></div>
+    </div>
+
+    <div class="history-section">
+        <h3>Laporan Transaksi</h3>
+        <table id="dbTable">
+            <thead><tr><th>WAKTU</th><th>LAYANAN</th><th>PRODUK</th><th>TUJUAN</th><th>TOTAL</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/Rahmancell.json";
+
+     const dataKuota = {
+        "TELKOMSEL": [
+            {p: "1GB/1hr = 9k", h: 7000}, {p: "1GB/3hr=12k", h: 10000}, {p: "2.5GB/3hr=14k", h: 12000},
+            {p: "3GB/1hr = 15k", h: 13000}, {p: "2,5GB/5hr = 15k", h: 13000}, {p: "2GB/7hr = 17k", h: 15000},
+            {p: "1,5GB/14hr = 25k", h: 23000}, {p: "3GB/3hr = 16k", h: 14000}, {p: "8GB/1bln = 40k", h: 38000}
+        ],
+        "INDOSAT": [
+            {p: "1,5GB 1hr", h: 6000}, {p: "1,5GB 3hr", h: 8000}, {p: "5GB 2hr", h: 10000},
+            {p: "2,5GB 3hr", h: 12000}, {p: "3GB 3hr", h: 13000}, {p: "2,5GB 5hr", h: 14000},
+            {p: "3,5GB 5hr", h: 15000}, {p: "5GB 5hr", h: 18000}, {p: "7GB 7hr", h: 26000},
+            {p: "9GB 7hr", h: 28000}, {p: "14GB 14hr", h: 50000}, {p: "5GB 28hr", h: 30000},
+            {p: "7GB 28hr", h: 32000}, {p: "8GB 28hr", h: 34000}, {p: "9GB 28hr", h: 36000},
+            {p: "10GB 30hr", h: 48000}, {p: "15GB 28hr", h: 53000}, {p: "20GB 30hr", h: 78000},
+            {p: "35GB 35hr", h: 82000}
+        ],
+        "XL": [
+            {p: "1GB 2hr = 6k", h: 4000}, {p: "2GB 2hr   8k", h: 6000}, {p: "3GB 2hr    11k", h: 9000},
+            {p: "5GB 2hr    13k", h: 11000}, {p: "2GB 5hr   16k", h: 14000}, {p: "2,5GB 7hr 18k", h: 16000},
+        ],
+        "AXIS": [
+            {p: "BRONET 1GB 1hr", h: 3000}, {p: "BRONET 5GB 7hr", h: 25000}, {p: "OWSEM 24GB 30hr", h: 55000},
+            {p: "BRONET 1GB 1hr", h: 3000}, {p: "BRONET 5GB 7hr", h: 25000}, {p: "OWSEM 24GB 30hr", h: 55000}
+        ],
+        "THREE": [
+            {p: "2,5gb/1h   7k", h: 5000}, {p: "3gb/1h  9k", h: 7000}, {p: "6gb/2h  12k", h: 10000},
+            {p: "3,5gb/3h   14k", h: 12000}, {p: "3,5gb/5h  17k", h: 15000}, {p: "2,5gb/14h 20k", h: 18000}
+        ],
+        "SMARTFREN": [
+            {p: "1gb/3h 9k", h: 7000}, {p: "2gb/3h  12k", h: 10000}, {p: "4gb/3h    13k", h: 11000},
+            {p: "3gb/2hr    11k", h: 9000}, {p: "3gb/5h 15k", h: 13000}, {p: "6gb/7h    17k", h: 15000}
+        ],
+        "BYU": [
+            {p: "4gb/3hr    10k", h: 8000}, {p: "10gb/1hr   12k", h: 10000}, {p: "3gb/7hr   13k", h: 11000},
+            {p: "5gb/7hr    15k", h: 13000}, {p: "7gb/14hr  17k", h: 15000}, {p: "10gb/14hr 26k", h: 24000}
+        ]
+    };
+
+
+    const dataGame = {
+        "MOBILE LEGENDS": [{p: "30 Diamonds", h: 10000}, {p: "44 Diamonds", h: 12000},
+            {p: "59 Diamonds", h: 16000}, {p: "70 Diamonds", h: 20000},
+            {p: "86 Diamonds", h: 25000}, {p: "100 Diamonds", h: 29000},
+            {p: "128 Diamonds", h: 35000}, {p: "141 Diamonds", h: 40000},
+            {p: "WeDePe", h: 30000}
+        ],
+        "FREE FIRE": [{p: "50 Diamonds", h: 8000}, {p: "70 Diamonds", h: 10000}, {p: "140 Diamonds", h: 20000},
+            {p: "355 Diamonds", h: 50000}, {p: "770 Diamonds", h: 100000},
+            {p: "1580 Diamonds", h: 200000}, {p: "2280 Diamonds", h: 300000},
+            {p: "Member mingguan", h: 30000}, {p: "Member Bulanan", h: 80000}
+        ],
+        "PUBG": [{p: "60 UC", h: 16000},{p: "300+25 UC", h: 80000},
+            {p: "600+60 UC", h: 160000},{p: "1500+300 UC", h: 400000},
+        ],
+        "ROBLOX": [{p: "Voucher 50k", h: 50000},{p: "Voucher 100k", h: 90000},{p: "Voucher 300k", h: 290000},{p: "Voucher 500k", h: 480000}
+        ],
+        "BLOOD STRIKE": [{p: "100 Gold", h: 14000},{p: "300 Gold", h: 40000},
+            {p: "500 Gold", h: 60000},{p: "1000 Gold", h: 130000}
+        ]
+    };
+
+    let LAYANAN = "";
+    let HARGA_FINAL = 0;
+
+    function showForm(tipe) {
+        LAYANAN = tipe.toUpperCase();
+        HARGA_FINAL = 0;
+        const area = document.getElementById('dynamic-inputs');
+        document.getElementById('summary-section').style.display = "none";
+        document.getElementById('form-title').innerText = "FORM " + LAYANAN;
+        document.getElementById('display-total').innerText = "Rp 0";
+        
+        if (tipe === 'pulsa') {
+            area.innerHTML = `
+                <div class="input-group"><label>No HP</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nominal</label><input type="number" id="inp_nom" placeholder="Wajib isi" oninput="hitung(this.value, 3000)"></div>`;
+        } else if (tipe === 'kuota') {
+            area.innerHTML = `<div class="input-group"><label>Operator</label>
+                <select ID="inp_op" onchange="loadKuota(this.value)">
+                    <option value="">-- Pilih --</option>
+                    <option value="TELKOMSEL">Telkomsel</option>
+                    <option value="INDOSAT">Indosat</option>
+                    <option value="XL">XL</option>
+                    <option value="AXIS">AXIS</option>
+                    <option value="THREE">Three (3)</option>
+                    <option value="SMARTFREN">Smartfren</option>
+                    <option value="BYU">by.U</option>
+                </select></div>
+                <div id="sub-kuota" class="input-group"></div>
+                <div class="input-group"><label>No HP</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>`;
+        } else if (tipe === 'ewallet') {
+            area.innerHTML = `
+                <div class="input-group"><label>E-Wallet</label><select id="inp_wal"><option value="">-- Pilih --</option><option value="DANA">DANA</option><option value="GOPAY">GOPAY</option></select></div>
+                <div class="input-group"><label>No HP</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nominal</label><input type="number" id="inp_nom" placeholder="Wajib isi" oninput="hitung(this.value, 2000)"></div>`;
+        } else if (tipe === 'game') {
+            area.innerHTML = `
+                <div class="input-group"><label>Pilih Game</label><select id="inp_game" onchange="loadGameFields(this.value)"><option value="" disabled selected>-- Pilih Game --</option><option value="MOBILE LEGENDS">Mobile Legends</option><option value="FREE FIRE">Free Fire</option><option value="PUBG">PUBG Mobile</option><option value="ROBLOX">Roblox</option><option value="BLOOD STRIKE">Blood Strike</option></select></div>
+                <div id="game-fields" style="display: contents;"></div>
+                <div id="nominal-field" class="input-group" style="display:none;"></div>`;
+        }
+    }
+
+    function loadGameFields(game) {
+        const fieldArea = document.getElementById('game-fields');
+        const nomArea = document.getElementById('nominal-field');
+        document.getElementById('summary-section').style.display = "none";
+        
+        let fields = `<div class="input-group"><label>Nama Pembeli</label><input type="text" id="v_nama" placeholder="Wajib isi"></div>`;
+        
+        if(game === "MOBILE LEGENDS") {
+            fields += `
+                <div class="input-group"><label>No HP (Aktif)</label><input type="number" id="v_telp" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>ID User</label><input type="number" id="v_id" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>ID Server</label><input type="number" id="v_server" placeholder="Wajib isi"></div>`;
+        } else if(game === "ROBLOX") {
+            fields += `
+                <div class="input-group"><label>No HP (Aktif)</label><input type="number" id="v_telp" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nicname</label><input type="text" id="v_nick" placeholder="Wajib isi"></div>`;
+        } else {
+            fields += `
+                <div class="input-group"><label>ID User</label><input type="text" id="v_id" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nicname</label><input type="text" id="v_nick" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>No HP (Aktif)</label><input type="number" id="v_telp" placeholder="Wajib isi"></div>`;
+        }
+        fieldArea.innerHTML = fields;
+
+        // Load Nominal Dropdown
+        let nomHtml = `<label>Pilih Nominal</label><select id="v_nom_g" onchange="hitungGame(this)"><option value="" disabled selected>-- Pilih Nominal --</option>`;
+        dataGame[game].forEach(i => nomHtml += `<option value="${i.p}" data-h="${i.h}">${i.p}</option>`);
+        nomArea.innerHTML = nomHtml + `</select>`;
+        nomArea.style.display = "flex";
+    }
+
+    function loadKuota(op) {
+        let h = `<label>Paket</label><select id="inp_pkt" onchange="hitung(this.options[this.selectedIndex].dataset.h, 2000)"><option value="">-- Pilih Paket --</option>`;
+        dataKuota[op].forEach(i => h += `<option value="${i.p}" data-h="${i.h}">${i.p}</option>`);
+        document.getElementById('sub-kuota').innerHTML = h + `</select>`;
+    }
+
+    function hitung(v, a) {
+        HARGA_FINAL = v ? (parseInt(v) + parseInt(a)) : 0;
+        document.getElementById('display-total').innerText = "Rp " + HARGA_FINAL.toLocaleString();
+        document.getElementById('summary-section').style.display = HARGA_FINAL > 0 ? "flex" : "none";
+    }
+
+    function hitungGame(el) {
+        HARGA_FINAL = parseInt(el.options[el.selectedIndex].dataset.h);
+        document.getElementById('display-total').innerText = "Rp " + HARGA_FINAL.toLocaleString();
+        document.getElementById('summary-section').style.display = "flex";
+    }
+
+    async function validasiKeras() {
+        let d = { waktu: new Date().toLocaleString('id-ID'), layanan: LAYANAN, total: HARGA_FINAL };
+        let ok = true;
+
+        if (LAYANAN === "PULSA") {
+            const n = document.getElementById('inp_no').value; const m = document.getElementById('inp_nom').value;
+            if(!n || !m) ok = false; d.isi = "PULSA " + m; d.tujuan = n;
+        } else if (LAYANAN === "KUOTA") {
+            const o = document.getElementById('inp_op').value; const p = document.getElementById('inp_pkt')?.value; const n = document.getElementById('inp_no').value;
+            if(!o || !p || !n) ok = false; d.isi = p; d.tujuan = o + " " + n;
+        } else if (LAYANAN === "EWALLET") {
+            const w = document.getElementById('inp_wal').value; const n = document.getElementById('inp_no').value; const m = document.getElementById('inp_nom').value;
+            if(!w || !n || !m) ok = false; d.isi = w + " " + m; d.tujuan = n;
+        } else if (LAYANAN === "GAME") {
+            const g = document.getElementById('inp_game').value;
+            const nm = document.getElementById('v_nama')?.value;
+            const tel = document.getElementById('v_telp')?.value;
+            const id = document.getElementById('v_id')?.value;
+            const srv = document.getElementById('v_server')?.value;
+            const nic = document.getElementById('v_nick')?.value;
+            const nom = document.getElementById('v_nom_g')?.value;
+
+            if (!g || !nm || !tel || !nom) ok = false;
+            
+            if (g === "MOBILE LEGENDS") {
+                if(!id || !srv) ok = false;
+                d.tujuan = `${nm} | ID: ${id}(${srv}) | Telp: ${tel}`;
+            } else if (g === "ROBLOX") {
+                if(!nic) ok = false;
+                d.tujuan = `${nm} | Nick: ${nic} | Telp: ${tel}`;
+            } else {
+                if(!id || !nic) ok = false;
+                d.tujuan = `${nm} | ID: ${id} | Nick: ${nic} | Telp: ${tel}`;
+            }
+            d.layanan = "GAME: " + g; d.isi = nom;
+        }
+
+        if (!ok || HARGA_FINAL === 0) return Swal.fire('GAGAL!', 'EHH, ENTE NIAT BELI NGGAK? KLO NIAT DI ISI!', 'error');
+
+        try {
+            const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(d) });
+            if(res.ok) {
+                Swal.fire({ icon: 'success', title: 'BERHASIL!', timer: 1000, showConfirmButton: false });
+                renderTable(); showForm(LAYANAN.toLowerCase());
+            }
+        } catch(e) { Swal.fire('Error', 'DB Offline', 'error'); }
+    }
+
+    async function renderTable() {
+        const res = await fetch(DATABASE_URL); const data = await res.json();
+        const list = data ? Object.values(data).reverse() : [];
+        let omzet = 0;
+        document.querySelector('#dbTable tbody').innerHTML = list.map(t => {
+            omzet += t.total;
+            return `<tr><td>${t.waktu}</td><td><b>${t.layanan}</b></td><td>${t.isi}</td><td>${t.tujuan}</td><td>Rp ${t.total.toLocaleString()}</td></tr>`;
+        }).join('');
+        document.getElementById('stat-omzet').innerText = "Rp " + omzet.toLocaleString();
+        document.getElementById('stat-count').innerText = list.length;
+    }
+    renderTable();
+</script>
+</body>
+</html>
