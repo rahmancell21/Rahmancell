@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RahmanCell - Cloud POS System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-hover: #4338ca; --bg: #f8fafc;
+            --card: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { margin: 0; color: var(--primary); font-weight: 700; letter-spacing: -1px; text-transform: uppercase; }
+        
+        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .stat-card h2 { margin: 5px 0 0; font-size: 20px; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        .menu-card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: 0.2s; border: 2px solid transparent; font-weight: 600; }
+        .menu-card:hover { transform: translateY(-2px); border-color: var(--primary); }
+
+        .form-container { background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #dynamic-inputs { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+        .input-group { flex: 1; min-width: 220px; display: flex; flex-direction: column; }
+        label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s; background-color: #fff; box-sizing: border-box; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+        .summary-card { background: #1e293b; color: white; padding: 25px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .summary-info h3 { margin: 0; font-size: 14px; color: #94a3b8; text-transform: uppercase; }
+        .total-price { font-size: 32px; font-weight: 700; color: #fff; margin-top: 5px; }
+        .btn-pay { background: var(--success); color: white; border: none; padding: 15px 40px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .btn-pay:hover { background: #16a34a; transform: translateY(-2px); }
+
+        .history-section { background: var(--card); padding: 20px; border-radius: 16px; overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; background: #f1f5f9; font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; background: #dcfce7; color: #166534; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>RAHMAN CELL</h1><p>Sistem Kasir & Laporan Cloud</p></header>
+
+    <div class="admin-dashboard">
+        <div class="stat-card"><small>Omzet Hari Ini</small><h2 id="stat-omzet">Rp 0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--success)"><small>Total Transaksi</small><h2 id="stat-count">0</h2></div>
+        <div class="stat-card" style="border-left-color: var(--warning)"><small>Status DB</small><h2 id="db-status" style="font-size: 16px; color: var(--success);">Online</h2></div>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-card" onclick="showForm('pulsa')">📱 PULSA</div>
+        <div class="menu-card" onclick="showForm('kuota')">🌐 KUOTA</div>
+        <div class="menu-card" onclick="showForm('ewallet')">💳 E-WALLET</div>
+        <div class="menu-card" onclick="showForm('game')" style="background: #fffbeb; color: #b45309;">🎮 TOP UP GAME</div>
+    </div>
+
+    <div class="form-container">
+        <h2 id="form-title" style="margin:0 0 20px 0; font-size: 18px; color: var(--primary);">Pilih Layanan</h2>
+        <div id="dynamic-inputs"><p style="color: var(--text-muted)">Silakan pilih salah satu menu di atas.</p></div>
+    </div>
+
+    <div class="summary-card" id="summary-section" style="display: none;">
+        <div class="summary-info"><h3>TOTAL TAGIHAN</h3><div class="total-price" id="display-total">Rp 0</div></div>
+        <div id="btn-area"></div>
+    </div>
+
+    <div class="history-section">
+        <h3 style="margin-top:0">Laporan Transaksi</h3>
+        <table id="dbTable">
+            <thead><tr><th>WAKTU</th><th>LAYANAN</th><th>PRODUK</th><th>TUJUAN</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const DATABASE_URL = "https://rahmancell-5af71-default-rtdb.asia-southeast1.firebasedatabase.app/Rahmancell.json";
+
+    const dataGame = {
+        "MOBILE LEGENDS": [{p: "86 Diamonds", h: 20000}, {p: "172 Diamonds", h: 40000}],
+        "FREE FIRE": [{p: "70 Diamonds", h: 10000}, {p: "140 Diamonds", h: 20000}],
+        "PUBG": [{p: "60 UC", h: 15000}],
+        "ROBLOX": [{p: "80 Robux", h: 15000}],
+        "BLOOD STRIKE": [{p: "100 Gold", h: 16000}]
+    };
+
+    let currentLayanan = "", selectedIsi = "", currentOp = "";
+
+    function showForm(tipe) {
+        currentLayanan = tipe.toUpperCase(); selectedIsi = "";
+        const container = document.getElementById('dynamic-inputs');
+        document.getElementById('summary-section').style.display = "flex";
+        document.getElementById('form-title').innerText = "Form " + currentLayanan;
+        document.getElementById('display-total').innerText = "Rp 0";
+        document.getElementById('btn-area').innerHTML = "";
+        
+        if (tipe === 'game') {
+            container.innerHTML = `
+                <div class="input-group"><label>Pilih Game</label>
+                <select id="sel_game" onchange="loadGameFields(this.value)">
+                    <option value="">-- Pilih Game --</option>
+                    <option value="MOBILE LEGENDS">Mobile Legends</option>
+                    <option value="FREE FIRE">Free Fire</option>
+                    <option value="PUBG">PUBG Mobile</option>
+                    <option value="ROBLOX">Roblox</option>
+                    <option value="BLOOD STRIKE">Blood Strike</option>
+                </select></div>
+                <div id="game-fields" style="display:contents"></div>`;
+        } else if (tipe === 'pulsa') {
+            container.innerHTML = `
+                <div class="input-group"><label>No HP Pelanggan</label><input type="number" id="input_no" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nominal</label><input type="number" id="nom_pulsa" oninput="selectedIsi=this.value; updateTotal(this.value, 3000)"></div>`;
+        } else if (tipe === 'ewallet') {
+            container.innerHTML = `
+                <div class="input-group"><label>E-Wallet</label><select id="w_type"><option value="">-- Pilih --</option><option value="DANA">DANA</option><option value="GOPAY">GoPay</option></select></div>
+                <div class="input-group"><label>No HP/ID User</label><input type="number" id="input_no" placeholder="Wajib isi"></div>
+                <div class="input-group"><label>Nominal</label><input type="number" oninput="selectedIsi=document.getElementById('w_type').value+' '+this.value; updateTotal(this.value, 2000)"></div>`;
+        }
+    }
+
+    function loadGameFields(game) {
+        const fieldArea = document.getElementById('game-fields');
+        if(!game) { fieldArea.innerHTML = ""; return; }
+        
+        let fields = `
+            <div class="input-group"><label>Nama Pembeli</label><input type="text" id="g_nama" placeholder="Wajib isi"></div>
+            <div class="input-group"><label>No HP (Aktif)</label><input type="number" id="g_telp" placeholder="Wajib isi"></div>`;
+        
+        if(game === "MOBILE LEGENDS") {
+            fields += `<div class="input-group"><label>ID User</label><input type="number" id="g_id" placeholder="Wajib isi"></div>
+                       <div class="input-group"><label>ID Server</label><input type="number" id="g_server" placeholder="Wajib isi"></div>`;
+        } else {
+            fields += `<div class="input-group"><label>ID User / Nickname</label><input type="text" id="g_id" placeholder="Wajib isi"></div>`;
+        }
+
+        fields += `<div class="input-group"><label>Pilih Nominal</label>
+            <select id="g_nom" onchange="selectedIsi='${game} '+this.value; updateTotal(this.options[this.selectedIndex].getAttribute('data-harga'), 0)">
+            <option value="">-- Pilih Nominal --</option>`;
+        dataGame[game].forEach(i => { fields += `<option value="${i.p}" data-harga="${i.h}">${i.p}</option>`; });
+        fields += `</select></div>`;
+        
+        fieldArea.innerHTML = fields;
+    }
+
+    function updateTotal(val, admin) {
+        if(!val || val == 0) return;
+        const total = parseInt(val) + admin;
+        document.getElementById('display-total').innerText = "Rp " + total.toLocaleString();
+        document.getElementById('btn-area').innerHTML = `<button class="btn-pay" onclick="validasiDanSimpan(${total})">PROSES & SIMPAN</button>`;
+    }
+
+    async function validasiDanSimpan(total) {
+        let tujuan = "";
+        let isLengkap = true;
+
+        if(currentLayanan === "GAME") {
+            const game = document.getElementById('sel_game').value;
+            const nama = document.getElementById('g_nama').value;
+            const telp = document.getElementById('g_telp').value;
+            const id = document.getElementById('g_id').value;
+            const nom = document.getElementById('g_nom').value;
+            
+            // Validasi khusus game
+            if(!nama || !telp || !id || !nom) isLengkap = false;
+            if(game === "MOBILE LEGENDS" && !document.getElementById('g_server').value) isLengkap = false;
+            
+            const server = document.getElementById('g_server')?.value || "";
+            tujuan = `${nama} (${telp}) | ID: ${id} ${server ? '['+server+']' : ''}`;
+        } else if(currentLayanan === "PULSA" || currentLayanan === "E-WALLET") {
+            const no = document.getElementById('input_no').value;
+            if(!no || !selectedIsi) isLengkap = false;
+            tujuan = no;
+        }
+
+        if(!isLengkap) {
+            Swal.fire({ icon: 'error', title: 'Transaksi Gagal!', text: 'Mohon lengkapi semua data yang diminta!', confirmButtonColor: '#ef4444' });
+            return;
+        }
+
+        // Jika lengkap, lanjut simpan
+        const dataBaru = { waktu: new Date().toLocaleString('id-ID'), layanan: currentLayanan, isi: selectedIsi, tujuan: tujuan, total: total };
+        try {
+            const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(dataBaru) });
+            if(res.ok) { 
+                Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Transaksi Tersimpan', timer: 1500, showConfirmButton: false });
+                renderTable(); showForm(currentLayanan.toLowerCase());
+            }
+        } catch (e) { Swal.fire('Error', 'Koneksi database bermasalah', 'error'); }
+    }
+
+    async function renderTable() {
+        const res = await fetch(DATABASE_URL); const data = await res.json();
+        const history = data ? Object.values(data) : [];
+        let omzet = 0;
+        document.querySelector('#dbTable tbody').innerHTML = history.reverse().map(t => {
+            omzet += t.total;
+            return `<tr><td>${t.waktu}</td><td><strong>${t.layanan}</strong></td><td>${t.isi}</td><td>${t.tujuan}</td><td>Rp ${t.total.toLocaleString()}</td><td><span class="badge">SUKSES</span></td></tr>`;
+        }).join('');
+        document.getElementById('stat-omzet').innerText = "Rp " + omzet.toLocaleString();
+        document.getElementById('stat-count').innerText = history.length;
+    }
+    renderTable();
+</script>
+</body>
+</html>
