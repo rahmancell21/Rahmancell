@@ -139,7 +139,16 @@
         ],
         "BLOOD STRIKE": [{p: "100 Gold", h: 14000},{p: "300 Gold", h: 40000},
             {p: "500 Gold", h: 60000},{p: "1000 Gold", h: 130000}
-        ]
+        ],
+        "DELTA FORCE": [{p: "18 deltacoins", h: 7000},{p: "30 deltacoins", h: 9000},
+            {p: "60 deltacoins", h: 18000},{p: "300 deltacoins", h:  90000}
+        ],
+        "ARENA BREAKOUT": [{p: "60 bonds", h: 14000},{p: "310 bonds", h: 80000},
+            {p: "630 bonds", h: 160000},{p: "1580 bonds", h: 400000}
+        ],
+        "CODM": [{p: "63 CP", h: 10000},{p: "128 CP", h: 20000},
+            {p: "321 CP", h: 50000},{p: "645 CP", h: 100000}
+        ],
     };
 
     let LAYANAN = "";
@@ -147,7 +156,6 @@
 
     function showForm(tipe) {
         LAYANAN = tipe.toUpperCase();
-        HARGA_FINAL = 0;
         const area = document.getElementById('dynamic-inputs');
         document.getElementById('summary-section').style.display = "none";
         document.getElementById('form-title').innerText = "FORM " + LAYANAN;
@@ -178,7 +186,7 @@
                 <div class="input-group"><label>Nominal</label><input type="number" id="inp_nom" placeholder="Wajib isi" oninput="hitung(this.value, 2000)"></div>`;
         } else if (tipe === 'game') {
             area.innerHTML = `
-                <div class="input-group"><label>Pilih Game</label><select id="inp_game" onchange="loadGameFields(this.value)"><option value="" disabled selected>-- Pilih Game --</option><option value="MOBILE LEGENDS">Mobile Legends</option><option value="FREE FIRE">Free Fire</option><option value="PUBG">PUBG Mobile</option><option value="ROBLOX">Roblox</option><option value="BLOOD STRIKE">Blood Strike</option></select></div>
+                <div class="input-group"><label>Pilih Game</label><select id="inp_game" onchange="loadGameFields(this.value)"><option value="" disabled selected>-- Pilih Game --</option><option value="MOBILE LEGENDS">Mobile Legends</option><option value="FREE FIRE">Free Fire</option><option value="PUBG">PUBG Mobile</option><option value="ROBLOX">Roblox</option><option value="BLOOD STRIKE">Blood Strike</option><option value="DELTA FORCE">Delta Force</option><option value="ARENA BREAKOUT">Arena Breakout</option><option value="CODM">Call Of Duty MOBILE</option></select></div>
                 <div id="game-fields" style="display: contents;"></div>
                 <div id="nominal-field" class="input-group" style="display:none;"></div>`;
         }
@@ -297,3 +305,4 @@
 </body>
 
 </html>
+
