@@ -98,33 +98,33 @@
             {p: "40GB 28hr = 76k(PROMO)", h: 74000}
         ],
         "XL": [
-            {p: "1GB 2hr = 6k(PROMO)", h: 4000}, {p: "3GB 2hr   11k(PROMO)", h: 6000}, {p: "5GB 2hr    12k(PROMO)", h: 10000},
-            {p: "1.25GB 5hr    13k(PROMO)", h: 11000}, {p: "2GB 4hr   15k(PROMO)", h: 13000}, {p: "5GB 3hr 18k(PROMO)", h: 16000},
+            {p: "1GB 2hr = 6k(PROMO)", h: 4000}, {p: "3GB 2hr = 11k(PROMO)", h: 6000}, {p: "5GB 2hr =  12k(PROMO)", h: 10000},
+            {p: "1.25GB 5hr = 13k(PROMO)", h: 11000}, {p: "2GB 4hr = 15k(PROMO)", h: 13000}, {p: "5GB 3hr = 18k(PROMO)", h: 16000},
         ],
         "AXIS": [
-            {p: "Lokal 15GB 1hr = 8k(PROMO)", h: 6000}, {p: "Lokal 5GB 2hr 11k(PROMO)", h: 9000}, {p: "Lokal 5GB 14hr = 24k(PROMO)", h: 22000},
-            {p: "Lokal 1GB 1hr", h: 3000}, {p: "BRONET 5GB 7hr", h: 25000}, {p: "OWSEM 24GB 30hr", h: 55000}
+            {p: "Lokal 15GB 1hr = 8k(PROMO)", h: 6000}, {p: "Lokal 5GB 2hr = 11k(PROMO)", h: 9000}, {p: "Lokal 5GB 14hr = 24k(PROMO)", h: 22000},
+            {p: "Lokal 17GB 7hr = 32k(PROMO)", h: 30000}, {p: "Aigo 7GB 28hr =32k(PROMO)", h: 30000}, {p: "Aigo 14GB 28hr = 42k(PROMO)", h: 40000}
         ],
         "THREE": [
-            {p: "2,5gb/1h   7k", h: 5000}, {p: "3gb/1h  9k", h: 7000}, {p: "6gb/2h  12k", h: 10000},
-            {p: "3,5gb/3h   14k", h: 12000}, {p: "3,5gb/5h  17k", h: 15000}, {p: "2,5gb/14h 20k", h: 18000}
+            {p: "2,5gb/1h   7k", h: 5000}, {p: "6gb/1h  9k(PROMO)", h: 7000}, {p: "6gb/2h  12k", h: 10000},
+            {p: "3,5+2gb/3h   14k(PROMO)", h: 12000}, {p: "1+0,5gb/5h  12k", h: 15000}, {p: "3+2gb/14h 23k(BONUS)", h: 21000}
         ],
         "SMARTFREN": [
-            {p: "1gb/3h 9k", h: 7000}, {p: "2gb/3h  12k", h: 10000}, {p: "4gb/3h    13k", h: 11000},
-            {p: "3gb/2hr    11k", h: 9000}, {p: "3gb/5h 15k", h: 13000}, {p: "6gb/7h    17k", h: 15000}
+            {p: "1gb/3hr = 8k(PROMO)", h: 6000}, {p: "2gb/3h = 11k(PROMO)", h: 9000}, {p: "4gb/3h = 12k(PROMO)", h: 10000},
+            {p: "4gb/5hr = 15k(PROMO)", h: 9000}, {p: "6gb/7h = 17k", h: 15000}, {p: "4gb/14h = 20k(PROMO)", h: 18000}
         ],
         "BYU": [
-            {p: "4gb/3hr    10k", h: 8000}, {p: "10gb/1hr   12k", h: 10000}, {p: "3gb/7hr   13k", h: 11000},
-            {p: "5gb/7hr    15k", h: 13000}, {p: "7gb/14hr  17k", h: 15000}, {p: "10gb/14hr 26k", h: 24000}
+            {p: "3gb/1hr = 9k", h: 7000}, {p: "10gb/1hr = 12k", h: 10000}, {p: "6gb/3hr   14k", h: 12000},
+            {p: "4gb/7hr = 15k", h: 13000}, {p: "7,5gb/5hr = 17k", h: 15000}, {p: "7,5gb/7hr = 19k", h: 17000}
         ]
     };
 
 
     const dataGame = {
-        "MOBILE LEGENDS": [{p: "30 Diamonds", h: 10000}, {p: "44 Diamonds", h: 12000},
-            {p: "59 Diamonds", h: 16000}, {p: "70 Diamonds", h: 20000},
-            {p: "86 Diamonds", h: 25000}, {p: "100 Diamonds", h: 29000},
-            {p: "128 Diamonds", h: 35000}, {p: "141 Diamonds", h: 40000},
+        "MOBILE LEGENDS": [{p: "28+2 Diamonds", h: 10000}, {p: "40+4 Diamonds", h: 12000},
+            {p: "50+9 Diamonds", h: 16000}, {p: "60+10 Diamonds", h: 20000},
+            {p: "80+6 Diamonds", h: 25000}, {p: "90+10 Diamonds", h: 29000},
+            {p: "120+8 Diamonds", h: 35000}, {p: "130+11 Diamonds", h: 40000},
             {p: "WeDePe", h: 30000}
         ],
         "FREE FIRE": [{p: "50 Diamonds", h: 8000}, {p: "70 Diamonds", h: 10000}, {p: "140 Diamonds", h: 20000},
@@ -181,7 +181,7 @@
                 <div class="input-group"><label>No HP</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>`;
         } else if (tipe === 'ewallet') {
             area.innerHTML = `
-                <div class="input-group"><label>E-Wallet</label><select id="inp_wal"><option value="">-- Pilih --</option><option value="DANA">DANA</option><option value="GOPAY">GOPAY</option></select></div>
+                <div class="input-group"><label>E-Wallet</label><select id="inp_wal"><option value="">-- Pilih --</option><option value="DANA">DANA</option><option value="GOPAY">GOPAY</option><option value="ShopeePay">ShopeePay</option></select></div>
                 <div class="input-group"><label>No HP</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>
                 <div class="input-group"><label>Nominal</label><input type="number" id="inp_nom" placeholder="Wajib isi" oninput="hitung(this.value, 2000)"></div>`;
         } else if (tipe === 'game') {
