@@ -241,10 +241,17 @@
         document.getElementById('summary-section').style.display = "flex";
     }
 
+    // KONFIGURASI DATA KAMU
+    const CONFIG = {
+        nomerWA: "6285129456337", // Ganti dengan nomor telepon kamu
+        urlQRIS: "https://i.postimg.cc/MpBK2KcD/Whats-App-Image-2026-03-16-at-09-03-18.jpg" // Ganti dengan link gambar QRIS kamu
+    };
+
     async function validasiKeras() {
         let d = { waktu: new Date().toLocaleString('id-ID'), layanan: LAYANAN, total: HARGA_FINAL };
         let ok = true;
 
+        // --- VALIDASI DATA INPUT (Tetap sama seperti kode awal kamu) ---
         if (LAYANAN === "PULSA") {
             const n = document.getElementById('inp_no').value; const m = document.getElementById('inp_nom').value;
             if(!n || !m) ok = false; d.isi = "PULSA " + m; d.tujuan = n;
@@ -262,31 +269,92 @@
             const srv = document.getElementById('v_server')?.value;
             const nic = document.getElementById('v_nick')?.value;
             const nom = document.getElementById('v_nom_g')?.value;
-
             if (!g || !nm || !tel || !nom) ok = false;
-            
-            if (g === "MOBILE LEGENDS") {
-                if(!id || !srv) ok = false;
-                d.tujuan = `${nm} | ID: ${id}(${srv}) | Telp: ${tel}`;
-            } else if (g === "ROBLOX") {
-                if(!nic) ok = false;
-                d.tujuan = `${nm} | Nick: ${nic} | Telp: ${tel}`;
-            } else {
-                if(!id || !nic) ok = false;
-                d.tujuan = `${nm} | ID: ${id} | Nick: ${nic} | Telp: ${tel}`;
-            }
+            if (g === "MOBILE LEGENDS") { if(!id || !srv) ok = false; d.tujuan = `${nm} | ID: ${id}(${srv}) | Telp: ${tel}`; } 
+            else if (g === "ROBLOX") { if(!nic) ok = false; d.tujuan = `${nm} | Nick: ${nic} | Telp: ${tel}`; } 
+            else { if(!id || !nic) ok = false; d.tujuan = `${nm} | ID: ${id} | Nick: ${nic} | Telp: ${tel}`; }
             d.layanan = "GAME: " + g; d.isi = nom;
         }
 
         if (!ok || HARGA_FINAL === 0) return Swal.fire('GAGAL!', 'DATA YANG DIMINTA BELUM LENGKAP!', 'error');
 
+        // --- TAHAP 1: PILIH METODE PEMBAYARAN ---
+        const { value: method } = await Swal.fire({
+            title: 'PILIH METODE PEMBAYARAN',
+            icon: 'question',
+            input: 'radio',
+            inputOptions: { 'qris': 'QRIS (Otomatis)', 'cash': 'CASH (Bayar di Tempat)' },
+            inputValidator: (value) => { if (!value) return 'Pilih salah satu!' }
+        });
+
+        d.metode = method.toUpperCase();
+
+        // --- TAHAP 2: PROSES BERDASARKAN METODE ---
+        if (method === 'qris') {
+            await Swal.fire({
+                title: 'SCAN QRIS DISINI',
+                text: 'Total: Rp ' + HARGA_FINAL.toLocaleString(),
+                imageUrl: CONFIG.urlQRIS,
+                imageWidth: 300,
+                confirmButtonText: 'SAYA SUDAH BAYAR',
+                allowOutsideClick: false
+            });
+            
+            await simpanKeDatabase(d);
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'TRANSAKSI DICATAT',
+                text: 'Silahkan kirim bukti pembayaran ke WhatsApp admin.',
+                confirmButtonText: 'KIRIM BUKTI PEMBAYARAN',
+                preConfirm: () => {
+                    window.open(`https://wa.me/${CONFIG.nomerWA}?text=Halo RahmanCell, saya ingin kirim bukti pembayaran untuk ${d.layanan} senilai Rp ${HARGA_FINAL.toLocaleString()}`);
+                }
+            });
+
+        } else {
+            await Swal.fire({
+                title: 'PEMBAYARAN CASH',
+                html: `
+                    <div style="text-align:center;">
+                        <p>Silahkan bayar ke admin di tempat atau konfirmasi via WhatsApp:</p>
+                        <a href="https://wa.me/${CONFIG.nomerWA}?text=Halo RahmanCell, saya ingin bayar CASH untuk ${d.layanan} sejumlah Rp ${HARGA_FINAL.toLocaleString()}" 
+                           target="_blank" 
+                           style="display:inline-block; background:#25d366; color:white; padding:12px 20px; border-radius:10px; text-decoration:none; font-weight:bold; margin-bottom:15px;">
+                           💬 CHAT ADMIN SEKARANG
+                        </a>
+                        <br>
+                        <small style="color:var(--text-muted)">Atau salin nomor manual:</small><br>
+                        <b style="font-size:18px; color:var(--primary)">${CONFIG.nomerWA}</b><br>
+                        <button onclick="salinNomor()" class="btn-pay" style="padding:8px 15px; font-size:11px; margin-top:10px;">SALIN NOMOR</button>
+                    </div>`,
+                confirmButtonText: 'KONFIRMASI SELESAI',
+                allowOutsideClick: false
+            });
+
+            // Simpan ke DB
+            await simpanKeDatabase(d);
+        }
+        // Reset Form
+        renderTable(); 
+        showForm(LAYANAN.toLowerCase());
+    }
+
+    // Fungsi tambahan untuk simpan database agar kode lebih rapi
+    async function simpanKeDatabase(data) {
         try {
-            const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(d) });
-            if(res.ok) {
-                Swal.fire({ icon: 'success', title: 'BERHASIL! QRIS AKAN DIKIRIM KE NOMOR TELEPON', timer: 1000, showConfirmButton: false });
-                renderTable(); showForm(LAYANAN.toLowerCase());
-            }
-        } catch(e) { Swal.fire('Error', 'DB Offline', 'error'); }
+            const res = await fetch(DATABASE_URL, { method: 'POST', body: JSON.stringify(data) });
+            if(!res.ok) throw new Error();
+        } catch(e) { 
+            Swal.fire('Error', 'Gagal menyimpan ke database, tapi transaksi tetap diproses.', 'warning'); 
+        }
+    }
+
+    // Fungsi untuk salin nomor telepon
+    function salinNomor() {
+        navigator.clipboard.writeText(CONFIG.nomerWA);
+        Swal.showValidationMessage('Nomor berhasil disalin!');
+        setTimeout(() => Swal.resetValidationMessage(), 2000);
     }
 
     async function renderTable() {
