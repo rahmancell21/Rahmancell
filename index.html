@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -45,7 +46,7 @@
 <body>
 
 <div class="container">
-    <header><h1>RAHMAN CELL</h1><p>MURAH, AMAN, DAN TERPERCAYA</p><p>HARGA YANG TERCANTUM SUDAH TERMASUK ADMIN, PAJAK, DLL</p><p>NYARI PROMO? SEEP BRAYY</p></header>
+    <header><h1>RAHMAN CELL</h1><p>MURAH, AMAN, DAN TERPERCAYA</p><p>HARGA YANG TERCANTUM SUDAH TERMASUK ADMIN, PAJAK, DLL</p><p>NYARI PROMO? ABIS BANG</p></header>
 
     <div class="admin-dashboard">
         <div class="stat-card"><small>Omzet Hari Ini</small><h2 id="stat-omzet">Rp 0</h2></div>
@@ -58,6 +59,7 @@
         <div class="menu-card" onclick="showForm('kuota')">🌐 KUOTA</div>
         <div class="menu-card" onclick="showForm('ewallet')">💳 E-WALLET</div>
         <div class="menu-card" onclick="showForm('game')" style="background: #fffbeb; color: #b45309;">🎮 TOP UP GAME</div>
+        <div class="menu-card" onclick="showForm('premium')" style="background: #f0fdf4; color: #15803d;">✨ APPS PREMIUM</div>
     </div>
 
     <div class="form-container">
@@ -119,6 +121,32 @@
         ]
     };
 
+const dataPremium = {
+        "CAPCUT": [
+            {p: "Pro 1 Bulan (Sharing)", h: 15000}, {p: "Pro 1 Tahun (Full)", h: 80000}
+        ],
+        "ALIGHT MOTION": [
+            {p: "Premium 1 Bulan", h: 12000}, {p: "Premium 1 Tahun", h: 45000}
+        ],
+        "CANVA": [
+            {p: "Pro 1 Bulan (Invite Link)", h: 10000}, {p: "Pro 1 Tahun (Invite Link)", h: 50000}
+        ],
+        "VIDIO": [
+            {p: "Platinum 30 Hari", h: 35000}, {p: "Diamond (EPL) 30 Hari", h: 79000}
+        ],
+        "VISION+": [
+            {p: "Premium 30 Hari", h: 20000}, {p: "Premium Sports 30 Hari", h: 35000}
+        ],
+        "RCTI+": [
+            {p: "Premium Tanpa Iklan 30 Hari", h: 15000}
+        ],
+        "VIU": [
+            {p: "Premium 1 Bulan (Sharing)", h: 10000}, {p: "Premium 6 Bulan", h: 45000}
+        ],
+        "WETV": [
+            {p: "VIP 1 Bulan", h: 25000}, {p: "VIP 1 Tahun", h: 150000}
+        ]
+    };
 
     const dataGame = {
         "MOBILE LEGENDS": [{p: "28+2 Diamonds = 10k", h: 10000}, {p: "40+4 Diamonds = 12k", h: 12000},
@@ -189,8 +217,34 @@
                 <div class="input-group"><label>Pilih Game</label><select id="inp_game" onchange="loadGameFields(this.value)"><option value="" disabled selected>-- Pilih Game --</option><option value="MOBILE LEGENDS">Mobile Legends</option><option value="FREE FIRE">Free Fire</option><option value="PUBG">PUBG Mobile</option><option value="ROBLOX">Roblox</option><option value="BLOOD STRIKE">Blood Strike</option><option value="DELTA FORCE">Delta Force</option><option value="ARENA BREAKOUT">Arena Breakout</option><option value="CODM">Call Of Duty MOBILE</option></select></div>
                 <div id="game-fields" style="display: contents;"></div>
                 <div id="nominal-field" class="input-group" style="display:none;"></div>`;
-        }
+        } else  if (tipe === 'premium') {
+            area.innerHTML = `
+            <div class="input-group">
+                <label>Pilih Aplikasi</label>
+                <select id="inp_app" onchange="loadPremium(this.value)">
+                    <option value="">-- Pilih APK --</option>
+                    <option value="CAPCUT">Capcut</option>
+                    <option value="ALIGHT MOTION">Alight Motion</option>
+                    <option value="CANVA">Canva</option>
+                    <option value="VIDIO">Vidio</option>
+                    <option value="VISION+">Vision+</option>
+                    <option value="RCTI+">RCTI+</option>
+                    <option value="VIU">Viu</option>
+                    <option value="WETV">WeTV</option>
+                </select>
+            </div>
+            <div id="sub-premium" class="input-group"></div>
+            <div class="input-group"><label>No HP Aktif</label><input type="number" id="inp_no" placeholder="Wajib isi"></div>`;
     }
+}
+
+    function loadPremium(app) {
+        let h = `<label>Pilih Paket</label><select id="inp_pkt_premium" onchange="hitung(this.options[this.selectedIndex].dataset.h, 0)">
+                 <option value="">-- Pilih Paket --</option>`;
+        dataPremium[app].forEach(i => h += `<option value="${i.p}" data-h="${i.h}">${i.p}</option>`);
+        document.getElementById('sub-premium').innerHTML = h + `</select>`;
+    }
+    
 
     function loadGameFields(game) {
         const fieldArea = document.getElementById('game-fields');
@@ -274,6 +328,15 @@
             else if (g === "ROBLOX") { if(!nic) ok = false; d.tujuan = `${nm} | Nick: ${nic} | Telp: ${tel}`; } 
             else { if(!id || !nic) ok = false; d.tujuan = `${nm} | ID: ${id} | Nick: ${nic} | Telp: ${tel}`; }
             d.layanan = "GAME: " + g; d.isi = nom;
+        // Tambahkan di dalam blok if/else validasi di validasiKeras()
+        } else if (LAYANAN === "PREMIUM") {
+            const app = document.getElementById('inp_app').value;
+            const pkt = document.getElementById('inp_pkt_premium')?.value;
+            const no = document.getElementById('inp_no').value;
+            if(!app || !pkt || !no) ok = false;
+            d.layanan = "PREMIUM: " + app;
+            d.isi = pkt;
+            d.tujuan = no;
         }
 
         if (!ok || HARGA_FINAL === 0) return Swal.fire('GAGAL!', 'DATA YANG DIMINTA BELUM LENGKAP!', 'error');
