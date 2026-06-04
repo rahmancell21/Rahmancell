@@ -91,6 +91,8 @@ body::before{z-index:0}
 .bc:hover{border-color:var(--cyan);color:var(--text)}
 .bc.on{border-color:var(--gold);color:var(--gold2);background:rgba(240,165,0,.07)}
 .bc-ico{font-size:22px;display:block;margin-bottom:5px}
+.bc-img{width:36px;height:36px;object-fit:contain;display:block;margin:0 auto 5px;border-radius:8px}
+@media(max-width:600px){.bc-img{width:28px;height:28px}}
 .pgrid{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;padding-right:2px}
 .pi{background:var(--card2);border:1.5px solid var(--border);border-radius:var(--r2);padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:.16s}
 .pi:hover{border-color:var(--cyan)}
@@ -488,7 +490,7 @@ const PRODUK = {
     "VIDIO": [
       {nama:"Vidio 1 Bulan",       harga:32000},
     ],
-    "VIU": [
+    "ALIGHT MOTION": [
       {nama:"Premium +6 Bulan",    harga:3000},
     ],
   },
@@ -508,8 +510,37 @@ const BICO = {
   "BLOOD STRIKE":"🩸","DELTA FORCE":"🪖","CODM":"🎖️",
   "TELKOMSEL":"🔴","INDOSAT":"🔵","XL":"💛","AXIS":"🟢","THREE":"⚪","SMARTFREN":"🟣","BYU":"🩵",
   "DANA":"💙","GOPAY":"🟢","SHOPEEPAY":"🟠","OVO":"💜",
-  "PLN":"⚡","CAPCUT":"✂️","CANVA":"🎨","WETV":"📺","VIDIO":"🎬","VIU":"🎞️",
+  "PLN":"⚡","CAPCUT":"✂️","CANVA":"🎨","WETV":"📺","VIDIO":"🎬","ALIGHT MOTION":"🎞️",
 };
+
+// Ganti emoji dengan URL gambar logo
+// Kosongkan string "" jika mau tetap pakai emoji fallback
+const BIMG = {
+  "MOBILE LEGENDS": "https://i.postimg.cc/CMbK8hvt/download.jpg",
+  "FREE FIRE":      "https://i.postimg.cc/15Yb56pH/download-(2).jpg",
+  "PUBG MOBILE":    "https://i.postimg.cc/MpVt2jtG/pubg.jpg",
+  "ROBLOX":         "https://i.postimg.cc/ydBbrTHm/ROblox.png",   // kosong = pakai emoji
+  "BLOOD STRIKE":   "https://i.postimg.cc/dQN58FL9/bs.jpg",
+  "DELTA FORCE":    "https://i.postimg.cc/L85Rx2T2/unnamed-(1).png",
+  "CODM":           "https://i.postimg.cc/9M8YtPFC/cod.jpg",
+  "TELKOMSEL":      "https://i.postimg.cc/3w3XsfkM/telkom.jpg",
+  "INDOSAT":        "https://i.postimg.cc/xC4Lb0tH/indosat.png",
+  "XL":             "https://i.postimg.cc/fWVrqk4j/xl.png",
+  "THREE":          "https://i.postimg.cc/x12pdRX5/tri.jpg",
+  "SMARTFREN":      "https://i.postimg.cc/DwPj4Xs7/smrtfrn.png",
+  "BYU":            "https://i.postimg.cc/Z5Q9cf6p/byu.png",
+  "DANA":           "https://i.postimg.cc/q7CNZ8LR/dana.jpg",
+  "GOPAY":          "https://i.postimg.cc/NM65QBS4/gopay.png",
+  "SHOPEEPAY":      "https://i.postimg.cc/9010q1W9/sppy.png",
+  "OVO":            "https://i.postimg.cc/vHHcdRz5/ovo.png",
+  "PLN":            "",
+  "CAPCUT":         "https://i.postimg.cc/rpWp9qV2/cc.png",
+  "CANVA":          "https://i.postimg.cc/NMkfWbrc/canva.jpg",
+  "WETV":           "https://i.postimg.cc/Vv7sN6RM/wetv.jpg",
+  "VIDIO":          "https://i.postimg.cc/xTCT4vf5/vidio.png",
+  "VIU":            "https://i.postimg.cc/3JcJ5kWd/am.jpg",
+  // ... dst
+};  
 
 // ── STATE ──
 let S = { kat:null, brand:null, produk:null, tujuan:{}, metode:"qris" };
@@ -621,7 +652,11 @@ function setKat(kat) {
     const c = document.createElement('div');
     c.className = 'bc';
     c.id = 'b-' + esc(b);
-    c.innerHTML = `<span class="bc-ico">${BICO[b] || '🎮'}</span>${b}`;
+    const imgUrl = BIMG[b];
+    const icoHtml = imgUrl
+    ? `<img src="${imgUrl}" class="bc-img" alt="${b}">`
+    : `<span class="bc-ico">${BICO[b] || '🎮'}</span>`;
+    c.innerHTML = `${icoHtml}${b}`;
     c.onclick = () => pilihBrand(b);
     bgDiv.appendChild(c);
   });
