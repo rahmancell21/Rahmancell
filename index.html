@@ -63,7 +63,7 @@ body::before{z-index:0}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;width:100%}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
 .sbox{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;overflow:hidden;transition:all .3s}
-.sbox::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)}
+.sbox::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red)}
 .sbox.c2::after{background:var(--cyan)}.sbox.c3::after{background:var(--green)}.sbox.c4::after{background:var(--purple)}
 .sbox small{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:var(--fb)}
 .sbox b{font-family:var(--fh);font-size:20px;font-weight:700;transition:all .3s}
@@ -242,11 +242,11 @@ footer strong{font-family:var(--fh);font-size:15px;letter-spacing:2px;color:var(
 
 <main class="main">
   <div class="stats">
-    <div class="sbox"><small>Omzet Hari Ini</small><b id="st-omzet">Rp 0</b></div>
-    <div class="sbox c2"><small>Total Order</small><b id="st-tot">0</b></div>
-    <div class="sbox c3"><small>Selesai</small><b id="st-ok">0</b></div>
     <div class="sbox c4"><small>Pending</small><b id="st-pend">0</b></div>
-  </div>
+    <div class="sbox c2"><small>Proses</small><b id="st-proses">0</b></div>
+    <div class="sbox"><small>Gagal</small><b id="st-gagal">0</b></div>
+    <div class="sbox c3"><small>Selesai</small><b id="st-ok">0</b></div>
+</div>
 
   <div class="tabs" id="tabs"></div>
 
@@ -330,10 +330,10 @@ const QRIS_IMG   = "https://i.postimg.cc/xjRNCJGt/Whats-App-Image-2026-06-03-at-
 const PRODUK = {
   GAME: {
     "MOBILE LEGENDS": [
-      {nama:"28 Diamonds",         harga:10000},
-      {nama:"56 Diamonds",         harga:20000},
-      {nama:"86 Diamonds",         harga:29000},
-      {nama:"172 Diamonds",        harga:55000, tag:"POPULER"},
+      {nama:"20+8 Diamonds",         harga:10000},
+      {nama:"50+9 Diamonds",         harga:20000},
+      {nama:"77+8 Diamonds",         harga:29000},
+      {nama:"170 Diamonds",        harga:50000, tag:"DISKON"},
       {nama:"257 Diamonds",        harga:80000},
       {nama:"344 Diamonds",        harga:105000},
       {nama:"429 Diamonds",        harga:130000},
@@ -367,46 +367,47 @@ const PRODUK = {
       {nama:"500 Gold",            harga:65000},
     ],
     "DELTA FORCE": [
-      {nama:"18 Deltacoins",       harga:7000},
-      {nama:"60 Deltacoins",       harga:18000},
-      {nama:"120 Deltacoins",      harga:38000},
+      {nama:"18 Deltacoins",       harga:6000},
+      {nama:"30 Deltacoins",       harga:8000},
+      {nama:"60 Deltacoins",       harga:16000},
+      {nama:"300 Deltacoins",      harga:80000},
     ],
     "CODM": [
       {nama:"63 CP",               harga:10000},
       {nama:"128 CP",              harga:20000},
       {nama:"321 CP",              harga:50000},
-      {nama:"660 CP",              harga:100000},
+      {nama:"645 CP",              harga:100000},
     ],
   },
   PULSA: {
     "TELKOMSEL": [
-      {nama:"Pulsa 5.000",         harga:7000},
-      {nama:"Pulsa 10.000",        harga:12000},
-      {nama:"Pulsa 20.000",        harga:22000},
-      {nama:"Pulsa 50.000",        harga:52000},
-      {nama:"Pulsa 100.000",       harga:102000},
+      {nama:"Pulsa 5.000",         harga:8000},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 20.000",        harga:23000},
+      {nama:"Pulsa 50.000",        harga:53000},
+      {nama:"Pulsa 100.000",       harga:103000},
     ],
     "INDOSAT": [
-      {nama:"Pulsa 10.000",        harga:11500},
-      {nama:"Pulsa 20.000",        harga:21500},
-      {nama:"Pulsa 50.000",        harga:51500},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 20.000",        harga:23000},
+      {nama:"Pulsa 50.000",        harga:53000},
     ],
     "XL": [
-      {nama:"Pulsa 10.000",        harga:11500},
-      {nama:"Pulsa 25.000",        harga:26000},
-      {nama:"Pulsa 50.000",        harga:51000},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 25.000",        harga:28000},
+      {nama:"Pulsa 50.000",        harga:53000},
     ],
     "AXIS": [
-      {nama:"Pulsa 10.000",        harga:11000},
-      {nama:"Pulsa 25.000",        harga:26000},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 25.000",        harga:28000},
     ],
     "THREE": [
-      {nama:"Pulsa 10.000",        harga:11500},
-      {nama:"Pulsa 25.000",        harga:26500},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 25.000",        harga:28000},
     ],
     "SMARTFREN": [
-      {nama:"Pulsa 10.000",        harga:11000},
-      {nama:"Pulsa 25.000",        harga:26000},
+      {nama:"Pulsa 10.000",        harga:13000},
+      {nama:"Pulsa 25.000",        harga:28000},
     ],
   },
   KUOTA: {
@@ -417,14 +418,14 @@ const PRODUK = {
       {nama:"20 GB / 30 Hari",     harga:125000},
     ],
     "INDOSAT": [
-      {nama:"5 GB / 2 Hari",       harga:12000, tag:"PROMO"},
-      {nama:"6 GB / 30 Hari",      harga:30000, tag:"PROMO"},
-      {nama:"24 GB / 28 Hari",     harga:65000},
+      {nama:"5 GB / 2 Hari",       harga:12000, tag:"TERLARIS"},
+      {nama:"8 GB / 28 Hari",      harga:35000, tag:"PROMO"},
+      {nama:"30 GB / 28 Hari",     harga:65000},
     ],
     "XL": [
-      {nama:"1 GB / 2 Hari",       harga:6000,  tag:"PROMO"},
-      {nama:"5 GB / 3 Hari",       harga:18000},
-      {nama:"12 GB / 30 Hari",     harga:60000},
+      {nama:"1 GB / 1 Hari",       harga:6000,  tag:"PROMO"},
+      {nama:"5 GB / 3 Hari",       harga:16000},
+      {nama:"23 GB / 30 Hari",     harga:60000},
     ],
     "AXIS": [
       {nama:"5 GB / 2 Hari",       harga:11000, tag:"PROMO"},
@@ -838,17 +839,18 @@ async function loadRiwayat() {
 }
 
 function renderRiwayat(list) {
-  let omzet = 0, ok = 0, pend = 0;
-  list.forEach(t => {
-    omzet += Number(t.harga) || 0;
-    const st = String(t.status || '').toUpperCase();
-    if (st === 'SELESAI') ok++;
-    if (st === 'PENDING') pend++;
+  let ok = 0, pend = 0, proses = 0, gagal = 0;
+list.forEach(t => {
+  const st = String(t.status || '').toUpperCase();
+  if (st === 'SELESAI') ok++;
+  else if (st === 'PENDING') pend++;
+  else if (st === 'PROSES') proses++;
+  else if (st === 'GAGAL') gagal++;
   });
-  $('st-omzet').innerText = rp(omzet);
-  $('st-tot').innerText   = list.length;
-  $('st-ok').innerText    = ok;
-  $('st-pend').innerText  = pend;
+$('st-pend').innerText   = pend;
+$('st-proses').innerText = proses;
+$('st-gagal').innerText  = gagal;
+   $('st-ok').innerText     = ok;
 
   const tb = $('tbody');
   if (!list.length) {
